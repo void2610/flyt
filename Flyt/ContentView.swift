@@ -66,9 +66,12 @@ struct ContentView: View {
                             selectedNote.updatedAt = Date()
                         }
                     ))
-                    .font(.title)
+                    .font(.title2)
+                    .fontWeight(.semibold)
                     .textFieldStyle(.plain)
-                    .padding()
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
 
                     Divider()
 
@@ -80,19 +83,24 @@ struct ContentView: View {
                             selectedNote.updatedAt = Date()
                         }
                     ))
-                    .padding()
+                    .font(.body)
+                    .padding(20)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
 
                     Divider()
 
                     // 更新日時と文字数表示
                     HStack {
-                        Text("更新: \(selectedNote.updatedAt, style: .time)")
+                        Text("更新: \(selectedNote.updatedAt, formatter: dateFormatter)")
                         Spacer()
                         Text("文字数: \(selectedNote.content.count)")
                     }
                     .font(.caption)
-                    .foregroundColor(.gray)
-                    .padding()
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Color(NSColor.controlBackgroundColor).opacity(0.3))
                 }
                 .toolbar {
                     Button(role: .destructive, action: {
@@ -101,14 +109,16 @@ struct ContentView: View {
                         Label("削除", systemImage: "trash")
                     }
                 }
+                .id(selectedNote.id) // メモが変わったらビューを再生成
             } else {
                 // メモが選択されていない場合
-                VStack {
+                VStack(spacing: 16) {
                     Image(systemName: "note.text")
                         .font(.system(size: 60))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     Text("メモを選択してください")
-                        .foregroundColor(.gray)
+                        .font(.title3)
+                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -128,10 +138,31 @@ struct ContentView: View {
 
     // メモを削除
     private func deleteNote(_ note: Note) {
-        modelContext.delete(note)
+        // 削除前に次に選択するメモを決定
         if selectedNote?.id == note.id {
-            selectedNote = notes.first
+            // 削除するメモが選択中の場合、別のメモを選択
+            if let index = notes.firstIndex(where: { $0.id == note.id }) {
+                if index > 0 {
+                    // 一つ前のメモを選択
+                    selectedNote = notes[index - 1]
+                } else if notes.count > 1 {
+                    // 最初のメモを削除する場合は次のメモを選択
+                    selectedNote = notes[1]
+                } else {
+                    // 最後のメモを削除する場合は選択を解除
+                    selectedNote = nil
+                }
+            }
         }
+        modelContext.delete(note)
+    }
+
+    // 日付フォーマッター
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter
     }
 }
 

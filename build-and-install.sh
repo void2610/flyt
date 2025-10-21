@@ -4,6 +4,10 @@
 
 set -e
 
+# 既存のFlytアプリを終了
+echo "🛑 既存のFlytアプリを終了中..."
+pkill -x Flyt || true
+
 echo "🔨 リリースビルドを開始..."
 xcodebuild -project Flyt.xcodeproj \
   -scheme Flyt \
@@ -15,8 +19,11 @@ echo "📦 /Applicationsにコピー中..."
 rm -rf /Applications/Flyt.app
 cp -R ~/Library/Developer/Xcode/DerivedData/Flyt-*/Build/Products/Release/Flyt.app /Applications/
 
-echo "アクセシビリティ設定をリセット"
+echo "🔄 アクセシビリティ設定をリセット..."
 tccutil reset Accessibility void2610.Flyt
 
-echo "✅ 完了！ /Applications/Flyt.appを起動してください"
+echo "🚀 Flytアプリを起動中..."
+open /Applications/Flyt.app
+
+echo "✅ 完了！"
 echo "💡 Control+I でメモウィンドウを開きます"
