@@ -35,14 +35,14 @@
 			path = Flyt;
 			sourceTree = "<group>";
 		};
-		AE5D89D12EA790FE00C5A09C /* my-first-appTests */ = {
+		AE5D89D12EA790FE00C5A09C /* FlytTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "my-first-appTests";
+			path = FlytTests;
 			sourceTree = "<group>";
 		};
-		AE5D89DB2EA790FE00C5A09C /* my-first-appUITests */ = {
+		AE5D89DB2EA790FE00C5A09C /* FlytUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "my-first-appUITests";
+			path = FlytUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,8 +76,8 @@
 			isa = PBXGroup;
 			children = (
 				AE5D89BD2EA790FC00C5A09C /* Flyt */,
-				AE5D89D12EA790FE00C5A09C /* my-first-appTests */,
-				AE5D89DB2EA790FE00C5A09C /* my-first-appUITests */,
+				AE5D89D12EA790FE00C5A09C /* FlytTests */,
+				AE5D89DB2EA790FE00C5A09C /* FlytUITests */,
 				AE5D89BC2EA790FC00C5A09C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -131,7 +131,7 @@
 				AE5D89D02EA790FE00C5A09C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				AE5D89D12EA790FE00C5A09C /* my-first-appTests */,
+				AE5D89D12EA790FE00C5A09C /* FlytTests */,
 			);
 			name = FlytTests;
 			packageProductDependencies = (
@@ -154,7 +154,7 @@
 				AE5D89DA2EA790FE00C5A09C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				AE5D89DB2EA790FE00C5A09C /* my-first-appUITests */,
+				AE5D89DB2EA790FE00C5A09C /* FlytUITests */,
 			);
 			name = FlytUITests;
 			packageProductDependencies = (
