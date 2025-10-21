@@ -25,9 +25,6 @@ struct ContentView: View {
     // 選択中のメモ
     @State private var selectedNote: Note?
 
-    // アプリケーション状態
-    @EnvironmentObject var appState: AppState
-
     var body: some View {
         NavigationSplitView {
             // 左側: メモリスト

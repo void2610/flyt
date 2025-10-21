@@ -7,14 +7,19 @@
 
 import AppKit
 import SwiftUI
+import SwiftData
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     // イベントモニター（ローカルとグローバル）
     private var localEventMonitor: Any?
     private var globalEventMonitor: Any?
 
+    // ModelContext（ウィンドウ作成用）
+    var modelContext: ModelContext?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
-        print("📱 アプリケーション起動完了")
+        // アクセサリアプリケーションとして動作（Dockアイコンを非表示）
+        NSApp.setActivationPolicy(.accessory)
 
         // アクセシビリティ権限をチェック
         checkAccessibilityPermission()
@@ -28,18 +33,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
             _ = self.handleKeyEvent(event, isLocal: false)
         }
-
-        print("🎯 イベントモニター設定完了（ローカル + グローバル）")
     }
 
     // キーイベント処理
     private func handleKeyEvent(_ event: NSEvent, isLocal: Bool) -> NSEvent? {
-        let source = isLocal ? "ローカル" : "グローバル"
-        print("⌨️ [\(source)] キー入力: keyCode=\(event.keyCode), modifiers=\(event.modifierFlags)")
-
         // Control+Iが押された場合
         if event.modifierFlags.contains(.control) && event.keyCode == 34 { // 34 = I
-            print("✅ Control+I が検出されました")
             DispatchQueue.main.async {
                 self.toggleNoteWindow()
             }
@@ -49,64 +48,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // アクセシビリティ権限をチェック
-    private func checkAccessibilityPermission() {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: false]
+    @discardableResult
+    private func checkAccessibilityPermission() -> Bool {
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
         let accessEnabled = AXIsProcessTrustedWithOptions(options)
 
-        if accessEnabled {
-            print("✅ アクセシビリティ権限が許可されています")
-        } else {
-            print("⚠️ アクセシビリティ権限が必要です")
-            // 権限要求ダイアログを表示
-            DispatchQueue.main.async {
-                self.showAccessibilityAlert()
+        if !accessEnabled {
+            // 3秒後にシステム設定を開く
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                self.openAccessibilitySettings()
             }
         }
+
+        return accessEnabled
     }
 
-    // アクセシビリティ権限要求アラート
-    private func showAccessibilityAlert() {
-        let alert = NSAlert()
-        alert.messageText = "アクセシビリティ権限が必要です"
-        alert.informativeText = "フルスクリーンアプリ上でもキーボードショートカット（Control+I）を使用するには、アクセシビリティ権限が必要です。\n\n「システム設定」を開いて、「プライバシーとセキュリティ」→「アクセシビリティ」でこのアプリを許可してください。"
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "システム設定を開く")
-        alert.addButton(withTitle: "後で")
-
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            // システム設定を開く
-            let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-            NSWorkspace.shared.open(url)
-        }
+    // アクセシビリティ設定を直接開く
+    private func openAccessibilitySettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        NSWorkspace.shared.open(url)
     }
-    
+
     // メモウィンドウを開く/閉じる
     private func toggleNoteWindow() {
-        print("🔄 toggleNoteWindow() 実行")
-        print("📊 現在のウィンドウ数: \(NSApplication.shared.windows.count)")
+        WindowManager.shared.toggleWindow()
+    }
 
-        // 全ウィンドウを列挙
-        for (index, window) in NSApplication.shared.windows.enumerated() {
-            print("   ウィンドウ[\(index)]: identifier=\(window.identifier?.rawValue ?? "nil"), title=\(window.title), visible=\(window.isVisible)")
-        }
-
-        // "note-window"というIDのウィンドウを探す
-        if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "note-window" }) {
-            print("✅ メモウィンドウが見つかりました")
-            if window.isVisible {
-                print("👁️ ウィンドウを非表示にします")
-                window.orderOut(nil)
-            } else {
-                print("👁️ ウィンドウを表示します")
-                window.makeKeyAndOrderFront(nil)
-                NSApp.activate(ignoringOtherApps: true)
-            }
-        } else {
-            print("⚠️ メモウィンドウが見つかりません。通知を送信します")
-            // NotificationCenterで通知を送る
-            NotificationCenter.default.post(name: NSNotification.Name("ToggleNoteWindow"), object: nil)
-        }
+    // WindowManagerでウィンドウを初期化
+    func initializeWindow(modelContext: ModelContext) {
+        self.modelContext = modelContext
+        WindowManager.shared.createNoteWindow(modelContext: modelContext)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -117,6 +88,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let monitor = globalEventMonitor {
             NSEvent.removeMonitor(monitor)
         }
-        print("🧹 イベントモニターをクリーンアップしました")
     }
 }
