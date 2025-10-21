@@ -49,42 +49,17 @@ class WindowManager {
 
         // 追加設定
         window.hidesOnDeactivate = false
-        window.isMovableByWindowBackground = true
-        window.backgroundColor = .clear
-        window.isOpaque = false
 
-        // NSVisualEffectViewで半透明背景を作成
-        let visualEffectView = NSVisualEffectView()
-        visualEffectView.material = .hudWindow
-        visualEffectView.blendingMode = .behindWindow
-        visualEffectView.state = .active
-        visualEffectView.wantsLayer = true
-
-        // SwiftUIビューをNSHostingViewでラップ（背景を透明に）
+        // SwiftUIビューをNSHostingViewでラップ
         let contentView = ContentView()
             .environment(\.modelContext, modelContext)
-            .background(Color.clear)
 
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.translatesAutoresizingMaskIntoConstraints = false
 
         // SwiftUIのツールバーを有効化
         hostingView.sceneBridgingOptions = [.toolbars]
 
-        // HostingViewの背景も透明に
-        hostingView.wantsLayer = true
-        hostingView.layer?.backgroundColor = NSColor.clear.cgColor
-
-        // VisualEffectViewの上にHostingViewを配置
-        visualEffectView.addSubview(hostingView)
-        NSLayoutConstraint.activate([
-            hostingView.topAnchor.constraint(equalTo: visualEffectView.topAnchor),
-            hostingView.leadingAnchor.constraint(equalTo: visualEffectView.leadingAnchor),
-            hostingView.trailingAnchor.constraint(equalTo: visualEffectView.trailingAnchor),
-            hostingView.bottomAnchor.constraint(equalTo: visualEffectView.bottomAnchor)
-        ])
-
-        window.contentView = visualEffectView
+        window.contentView = hostingView
 
         self.noteWindow = window
     }
@@ -94,11 +69,34 @@ class WindowManager {
         guard let window = noteWindow else { return }
 
         if window.isVisible {
-            window.orderOut(nil)
+            hideWindowWithAnimation(window)
         } else {
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
+            showWindowWithAnimation(window)
         }
+    }
+
+    // アニメーション付きでウィンドウを表示
+    private func showWindowWithAnimation(_ window: NSWindow) {
+        window.center()
+        window.alphaValue = 0.0
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.15
+            window.animator().alphaValue = 1.0
+        })
+    }
+
+    // アニメーション付きでウィンドウを非表示
+    private func hideWindowWithAnimation(_ window: NSWindow) {
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.15
+            window.animator().alphaValue = 0.0
+        }, completionHandler: {
+            window.orderOut(nil)
+            window.alphaValue = 1.0
+        })
     }
 
     // ウィンドウを閉じる
