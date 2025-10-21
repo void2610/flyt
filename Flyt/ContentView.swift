@@ -26,7 +26,7 @@ struct ContentView: View {
     @State private var selectedNote: Note?
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: .constant(.all)) {
             // 左側: メモリスト
             List(selection: $selectedNote) {
                 ForEach(notes) { note in
@@ -54,6 +54,7 @@ struct ContentView: View {
                     Label("新規メモ", systemImage: "square.and.pencil")
                 }
             }
+            .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 350)
         } detail: {
             // 右側: メモ編集エリア
             if let selectedNote = selectedNote {
