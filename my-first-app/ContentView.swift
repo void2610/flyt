@@ -67,6 +67,7 @@ struct ContentView: View {
                         }
                     ))
                     .font(.title)
+                    .textFieldStyle(.plain)
                     .padding()
 
                     Divider()
@@ -80,6 +81,8 @@ struct ContentView: View {
                         }
                     ))
                     .padding()
+
+                    Divider()
 
                     // 更新日時と文字数表示
                     HStack {

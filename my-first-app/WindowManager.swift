@@ -26,7 +26,7 @@ class WindowManager {
         // NSWindowを手動で作成
         let window = NSWindow(
             contentRect: windowRect,
-            styleMask: [.titled, .closable, .resizable],
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
@@ -35,6 +35,10 @@ class WindowManager {
         window.title = "Quick Note"
         window.center()
         window.isReleasedWhenClosed = false
+
+        // タイトルバーの設定
+        window.titlebarAppearsTransparent = false
+        window.titleVisibility = .visible
 
         // フルスクリーンアプリの上に表示するための設定
         window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
@@ -60,6 +64,9 @@ class WindowManager {
 
         let hostingView = NSHostingView(rootView: contentView)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
+
+        // SwiftUIのツールバーを有効化
+        hostingView.sceneBridgingOptions = [.toolbars]
 
         // HostingViewの背景も透明に
         hostingView.wantsLayer = true
