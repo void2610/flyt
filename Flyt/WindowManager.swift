@@ -16,6 +16,9 @@ class WindowManager {
     // メモウィンドウ
     private var noteWindow: NSWindow?
 
+    // 設定ウィンドウ
+    private var settingsWindow: NSWindow?
+
     private init() {}
 
     // メモウィンドウを作成
@@ -102,5 +105,59 @@ class WindowManager {
     func closeWindow() {
         noteWindow?.close()
         noteWindow = nil
+    }
+
+    // 設定ウィンドウを作成
+    func createSettingsWindow() {
+        // 既に設定ウィンドウが存在する場合は作成しない
+        if settingsWindow != nil {
+            return
+        }
+
+        // ウィンドウのサイズと位置
+        let windowRect = NSRect(x: 0, y: 0, width: 400, height: 300)
+
+        // NSWindowを手動で作成
+        let window = NSWindow(
+            contentRect: windowRect,
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+
+        // ウィンドウの基本設定
+        window.title = "Flyt 設定"
+        window.center()
+        window.isReleasedWhenClosed = false
+
+        // 通常のウィンドウレベル（設定ウィンドウはフルスクリーン上に表示する必要はない）
+        window.level = .normal
+
+        // SwiftUIビューをNSHostingViewでラップ
+        let contentView = SettingsView()
+        let hostingView = NSHostingView(rootView: contentView)
+        window.contentView = hostingView
+
+        self.settingsWindow = window
+    }
+
+    // 設定ウィンドウを表示
+    func showSettingsWindow() {
+        // 設定ウィンドウがまだ作成されていない場合は作成
+        if settingsWindow == nil {
+            createSettingsWindow()
+        }
+
+        guard let window = settingsWindow else { return }
+
+        // ウィンドウを前面に表示
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // 設定ウィンドウを閉じる
+    func closeSettingsWindow() {
+        settingsWindow?.close()
+        settingsWindow = nil
     }
 }

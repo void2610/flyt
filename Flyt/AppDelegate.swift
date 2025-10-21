@@ -24,6 +24,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // アクセサリアプリケーションとして動作（Dockアイコンを非表示）
         NSApp.setActivationPolicy(.accessory)
 
+        // メニューバーアイコンをセットアップ
+        MenuBarManager.shared.setupMenuBar()
+
         // イベントモニターを設定
         setupEventMonitors()
 

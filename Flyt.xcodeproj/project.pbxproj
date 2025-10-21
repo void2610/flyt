@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AE5D89BB2EA790FC00C5A09C /* Flyt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Flyt.app"; path = Flyt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE5D89BB2EA790FC00C5A09C /* Flyt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flyt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
