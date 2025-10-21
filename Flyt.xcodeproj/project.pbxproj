@@ -24,15 +24,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AE5D89BB2EA790FC00C5A09C /* my-first-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "my-first-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AE5D89CE2EA790FE00C5A09C /* my-first-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "my-first-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AE5D89D82EA790FE00C5A09C /* my-first-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "my-first-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE5D89BB2EA790FC00C5A09C /* my-first-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "my-first-app.app"; path = Flyt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		AE5D89BD2EA790FC00C5A09C /* my-first-app */ = {
+		AE5D89BD2EA790FC00C5A09C /* Flyt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "my-first-app";
+			path = Flyt;
 			sourceTree = "<group>";
 		};
 		AE5D89D12EA790FE00C5A09C /* my-first-appTests */ = {
@@ -75,7 +75,7 @@
 		AE5D89B22EA790FC00C5A09C = {
 			isa = PBXGroup;
 			children = (
-				AE5D89BD2EA790FC00C5A09C /* my-first-app */,
+				AE5D89BD2EA790FC00C5A09C /* Flyt */,
 				AE5D89D12EA790FE00C5A09C /* my-first-appTests */,
 				AE5D89DB2EA790FE00C5A09C /* my-first-appUITests */,
 				AE5D89BC2EA790FC00C5A09C /* Products */,
@@ -86,8 +86,8 @@
 			isa = PBXGroup;
 			children = (
 				AE5D89BB2EA790FC00C5A09C /* my-first-app.app */,
-				AE5D89CE2EA790FE00C5A09C /* my-first-appTests.xctest */,
-				AE5D89D82EA790FE00C5A09C /* my-first-appUITests.xctest */,
+				AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */,
+				AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AE5D89BA2EA790FC00C5A09C /* my-first-app */ = {
+		AE5D89BA2EA790FC00C5A09C /* Flyt */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE5D89E22EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-app" */;
+			buildConfigurationList = AE5D89E22EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "Flyt" */;
 			buildPhases = (
 				AE5D89B72EA790FC00C5A09C /* Sources */,
 				AE5D89B82EA790FC00C5A09C /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				AE5D89BD2EA790FC00C5A09C /* my-first-app */,
+				AE5D89BD2EA790FC00C5A09C /* Flyt */,
 			);
-			name = "my-first-app";
+			name = Flyt;
 			packageProductDependencies = (
 			);
-			productName = "my-first-app";
+			productName = Flyt;
 			productReference = AE5D89BB2EA790FC00C5A09C /* my-first-app.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AE5D89CD2EA790FE00C5A09C /* my-first-appTests */ = {
+		AE5D89CD2EA790FE00C5A09C /* FlytTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE5D89E52EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-appTests" */;
+			buildConfigurationList = AE5D89E52EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "FlytTests" */;
 			buildPhases = (
 				AE5D89CA2EA790FE00C5A09C /* Sources */,
 				AE5D89CB2EA790FE00C5A09C /* Frameworks */,
@@ -133,16 +133,16 @@
 			fileSystemSynchronizedGroups = (
 				AE5D89D12EA790FE00C5A09C /* my-first-appTests */,
 			);
-			name = "my-first-appTests";
+			name = FlytTests;
 			packageProductDependencies = (
 			);
 			productName = "my-first-appTests";
-			productReference = AE5D89CE2EA790FE00C5A09C /* my-first-appTests.xctest */;
+			productReference = AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AE5D89D72EA790FE00C5A09C /* my-first-appUITests */ = {
+		AE5D89D72EA790FE00C5A09C /* FlytUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AE5D89E82EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-appUITests" */;
+			buildConfigurationList = AE5D89E82EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "FlytUITests" */;
 			buildPhases = (
 				AE5D89D42EA790FE00C5A09C /* Sources */,
 				AE5D89D52EA790FE00C5A09C /* Frameworks */,
@@ -156,11 +156,11 @@
 			fileSystemSynchronizedGroups = (
 				AE5D89DB2EA790FE00C5A09C /* my-first-appUITests */,
 			);
-			name = "my-first-appUITests";
+			name = FlytUITests;
 			packageProductDependencies = (
 			);
 			productName = "my-first-appUITests";
-			productReference = AE5D89D82EA790FE00C5A09C /* my-first-appUITests.xctest */;
+			productReference = AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AE5D89B62EA790FC00C5A09C /* Build configuration list for PBXProject "my-first-app" */;
+			buildConfigurationList = AE5D89B62EA790FC00C5A09C /* Build configuration list for PBXProject "Flyt" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AE5D89BA2EA790FC00C5A09C /* my-first-app */,
-				AE5D89CD2EA790FE00C5A09C /* my-first-appTests */,
-				AE5D89D72EA790FE00C5A09C /* my-first-appUITests */,
+				AE5D89BA2EA790FC00C5A09C /* Flyt */,
+				AE5D89CD2EA790FE00C5A09C /* FlytTests */,
+				AE5D89D72EA790FE00C5A09C /* FlytUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		AE5D89D02EA790FE00C5A09C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AE5D89BA2EA790FC00C5A09C /* my-first-app */;
+			target = AE5D89BA2EA790FC00C5A09C /* Flyt */;
 			targetProxy = AE5D89CF2EA790FE00C5A09C /* PBXContainerItemProxy */;
 		};
 		AE5D89DA2EA790FE00C5A09C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AE5D89BA2EA790FC00C5A09C /* my-first-app */;
+			target = AE5D89BA2EA790FC00C5A09C /* Flyt */;
 			targetProxy = AE5D89D92EA790FE00C5A09C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -406,7 +406,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-app";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.Flyt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -432,7 +432,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-app";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.Flyt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -452,7 +452,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/my-first-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/my-first-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Flyt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Flyt";
 			};
 			name = Debug;
 		};
@@ -469,7 +469,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/my-first-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/my-first-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Flyt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Flyt";
 			};
 			name = Release;
 		};
@@ -506,7 +506,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AE5D89B62EA790FC00C5A09C /* Build configuration list for PBXProject "my-first-app" */ = {
+		AE5D89B62EA790FC00C5A09C /* Build configuration list for PBXProject "Flyt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE5D89E02EA790FE00C5A09C /* Debug */,
@@ -515,7 +515,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE5D89E22EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-app" */ = {
+		AE5D89E22EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "Flyt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE5D89E32EA790FE00C5A09C /* Debug */,
@@ -524,7 +524,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE5D89E52EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-appTests" */ = {
+		AE5D89E52EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "FlytTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE5D89E62EA790FE00C5A09C /* Debug */,
@@ -533,7 +533,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AE5D89E82EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "my-first-appUITests" */ = {
+		AE5D89E82EA790FE00C5A09C /* Build configuration list for PBXNativeTarget "FlytUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AE5D89E92EA790FE00C5A09C /* Debug */,

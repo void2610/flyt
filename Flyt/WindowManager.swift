@@ -32,7 +32,7 @@ class WindowManager {
         )
 
         // ウィンドウの基本設定
-        window.title = "Quick Note"
+        window.title = "Flyt"
         window.center()
         window.isReleasedWhenClosed = false
 
