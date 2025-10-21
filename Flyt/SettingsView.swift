@@ -33,9 +33,9 @@ struct SettingsView: View {
                     .font(.headline)
 
                 HStack {
-                    Text("バージョン:")
+                    Text("version:")
                     Spacer()
-                    Text("1.0")
+                    Text("0.1.0")
                         .foregroundColor(.secondary)
                 }
 
@@ -53,7 +53,7 @@ struct SettingsView: View {
             // フッター
             HStack {
                 Spacer()
-                Text("© 2025 Flyt")
+                Text("© 2025 void2610")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
