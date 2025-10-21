@@ -30,6 +30,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // イベントモニターを設定
         setupEventMonitors()
 
+        // ホットコーナーマネージャーをセットアップ
+        setupHotCorner()
+
         // 権限がない場合、定期的にチェックして自動的にイベントモニターを再登録
         if !AXIsProcessTrusted() {
             checkAccessibilityPermission()
@@ -131,6 +134,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.open(url)
     }
 
+    // ホットエッジをセットアップ
+    private func setupHotCorner() {
+        // ホットエッジのトリガーコールバックを設定
+        HotCornerManager.shared.onTrigger = { [weak self] in
+            DispatchQueue.main.async {
+                self?.toggleNoteWindow()
+            }
+        }
+
+        // 監視を開始
+        HotCornerManager.shared.startMonitoring()
+    }
+
     // メモウィンドウを開く/閉じる
     private func toggleNoteWindow() {
         WindowManager.shared.toggleWindow()
@@ -150,6 +166,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let monitor = globalEventMonitor {
             NSEvent.removeMonitor(monitor)
         }
+
+        // ホットエッジ監視を停止
+        HotCornerManager.shared.stopMonitoring()
 
         // タイマーをクリーンアップ
         stopPermissionMonitoring()

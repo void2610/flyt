@@ -1,0 +1,117 @@
+//
+//  HotCornerSettingsView.swift
+//  Flyt
+//
+//  ホットエッジ設定のビュー
+//
+
+import SwiftUI
+
+struct HotCornerSettingsView: View {
+    @ObservedObject var manager = HotCornerManager.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // 有効/無効トグル
+            Toggle("ホットエッジを有効にする", isOn: Binding(
+                get: { manager.isEnabled },
+                set: { newValue in
+                    manager.updateSettings(corner: manager.selectedCorner, enabled: newValue)
+                }
+            ))
+
+            if manager.isEnabled {
+                // エッジ選択
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("トリガーする辺:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    Picker("", selection: Binding(
+                        get: { manager.selectedCorner },
+                        set: { newValue in
+                            manager.updateSettings(corner: newValue, enabled: manager.isEnabled)
+                        }
+                    )) {
+                        ForEach(HotCorner.allCases, id: \.self) { corner in
+                            Text(corner.rawValue).tag(corner)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 150)
+
+                    // 視覚的なプレビュー
+                    HotCornerPreview(selectedCorner: manager.selectedCorner)
+                        .frame(height: 120)
+                        .padding(.top, 8)
+                }
+            }
+        }
+    }
+}
+
+// ホットエッジの視覚的なプレビュー
+struct HotCornerPreview: View {
+    let selectedCorner: HotCorner
+
+    var body: some View {
+        ZStack {
+            // スクリーンを表す矩形
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.secondary.opacity(0.5), lineWidth: 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
+
+            // 4つの辺にインジケーターを配置
+            VStack(spacing: 0) {
+                // 上辺
+                EdgeIndicator(isActive: selectedCorner == .top, isHorizontal: true)
+                    .frame(height: 4)
+
+                Spacer()
+
+                HStack(spacing: 0) {
+                    // 左辺
+                    EdgeIndicator(isActive: selectedCorner == .left, isHorizontal: false)
+                        .frame(width: 4)
+
+                    Spacer()
+
+                    // 右辺
+                    EdgeIndicator(isActive: selectedCorner == .right, isHorizontal: false)
+                        .frame(width: 4)
+                }
+
+                Spacer()
+
+                // 下辺
+                EdgeIndicator(isActive: selectedCorner == .bottom, isHorizontal: true)
+                    .frame(height: 4)
+            }
+            .padding(8)
+        }
+    }
+}
+
+// エッジインジケーター
+struct EdgeIndicator: View {
+    let isActive: Bool
+    let isHorizontal: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(isActive ? Color.accentColor : Color.secondary.opacity(0.3))
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(isActive ? Color.accentColor : Color.clear, lineWidth: 1)
+            )
+    }
+}
+
+#Preview {
+    HotCornerSettingsView()
+        .padding()
+        .frame(width: 400)
+}

@@ -9,58 +9,69 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // タイトル
-            Text("設定")
-                .font(.title)
-                .fontWeight(.bold)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // タイトル
+                Text("設定")
+                    .font(.title)
+                    .fontWeight(.bold)
 
-            Divider()
+                Divider()
 
-            // ホットキー設定
-            VStack(alignment: .leading, spacing: 8) {
-                Text("キーボードショートカット")
-                    .font(.headline)
+                // ホットキー設定
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("キーボードショートカット")
+                        .font(.headline)
 
-                HotKeyRecorderView()
-            }
-
-            Divider()
-
-            // アプリ情報
-            VStack(alignment: .leading, spacing: 8) {
-                Text("アプリ情報")
-                    .font(.headline)
-
-                HStack {
-                    Text("version:")
-                    Spacer()
-                    Text("0.1.0")
-                        .foregroundColor(.secondary)
+                    HotKeyRecorderView()
                 }
 
-                HStack {
-                    Text("Bundle ID:")
-                    Spacer()
-                    Text("void2610.Flyt")
-                        .foregroundColor(.secondary)
-                        .font(.system(.body, design: .monospaced))
+                Divider()
+
+                // ホットエッジ設定
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("ホットエッジ")
+                        .font(.headline)
+
+                    HotCornerSettingsView()
                 }
-            }
 
-            Spacer()
+                Divider()
 
-            // フッター
-            HStack {
-                Spacer()
-                Text("© 2025 void2610")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
+                // アプリ情報
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("アプリ情報")
+                        .font(.headline)
+
+                    HStack {
+                        Text("version:")
+                        Spacer()
+                        Text("0.1.0")
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack {
+                        Text("Bundle ID:")
+                        Spacer()
+                        Text("void2610.Flyt")
+                            .foregroundColor(.secondary)
+                            .font(.system(.body, design: .monospaced))
+                    }
+                }
+
+                // フッター
+                HStack {
+                    Spacer()
+                    Text("© 2025 void2610")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .padding(.top, 20)
             }
+            .padding(20)
         }
-        .padding(20)
-        .frame(width: 400, height: 300)
+        .frame(width: 400, height: 500)
     }
 }
 

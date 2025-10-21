@@ -82,6 +82,17 @@ class WindowManager {
 
     // アニメーション付きでウィンドウを表示
     private func showWindowWithAnimation(_ window: NSWindow) {
+        // ウィンドウレベルを再設定（フルスクリーンアプリの上に表示するため）
+        window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
+
+        // collectionBehaviorも再設定
+        window.collectionBehavior = [
+            .canJoinAllSpaces,
+            .fullScreenAuxiliary,
+            .stationary,
+            .ignoresCycle
+        ]
+
         // 現在アクティブなスペース（フルスクリーンアプリが表示されているスペース）を取得
         if let screen = NSScreen.main {
             // スクリーンの中央にウィンドウを配置
@@ -127,7 +138,7 @@ class WindowManager {
         }
 
         // ウィンドウのサイズと位置
-        let windowRect = NSRect(x: 0, y: 0, width: 400, height: 300)
+        let windowRect = NSRect(x: 0, y: 0, width: 400, height: 500)
 
         // NSWindowを手動で作成
         let window = NSWindow(
