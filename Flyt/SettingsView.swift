@@ -22,16 +22,7 @@ struct SettingsView: View {
                 Text("キーボードショートカット")
                     .font(.headline)
 
-                HStack {
-                    Text("メモを表示/非表示:")
-                    Spacer()
-                    Text("⌃I")
-                        .font(.system(.body, design: .monospaced))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.secondary.opacity(0.2))
-                        .cornerRadius(4)
-                }
+                HotKeyRecorderView()
             }
 
             Divider()

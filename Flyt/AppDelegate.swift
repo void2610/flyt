@@ -78,8 +78,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // キーイベント処理
     private func handleKeyEvent(_ event: NSEvent, isLocal: Bool) -> NSEvent? {
-        // Control+Iが押された場合
-        if event.modifierFlags.contains(.control) && event.keyCode == 34 { // 34 = I
+        // 設定されたホットキーと一致するかチェック
+        if HotKeyManager.shared.matches(event: event) {
             DispatchQueue.main.async {
                 self.toggleNoteWindow()
             }
