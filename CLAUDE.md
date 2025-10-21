@@ -31,15 +31,33 @@ SwiftUI の標準 Window シーンではフルスクリーンアプリの上に�
    - `window.collectionBehavior = [.canJoinAllSpaces, .transient, .fullScreenAuxiliary]` で全スペース対応
    - `NSHostingView` で SwiftUI コンテンツをラップ
    - **重要**: `hostingView.sceneBridgingOptions = [.toolbars]` で SwiftUI の `.toolbar` 修飾子を NSWindow で有効化
+   - メモウィンドウと設定ウィンドウの両方を管理（設定ウィンドウは通常のウィンドウレベル）
 
 2. **AppDelegate.swift**: グローバルホットキー監視
-   - `NSEvent.addGlobalMonitorForEvents` でシステム全体のキー入力を監視
+   - ローカル (`NSEvent.addLocalMonitorForEvents`) とグローバル (`NSEvent.addGlobalMonitorForEvents`) の両方のイベントモニターを使用
+   - HotKeyManager と連携してホットキーの一致を判定
    - アクセシビリティ権限が必要（初回起動時にダイアログ表示）
    - Timer による権限付与の自動検出とイベントモニターの再登録
 
 3. **FlytApp.swift**: エントリーポイント
    - `NSApp.setActivationPolicy(.accessory)` で Dock アイコンを非表示
    - ダミー WindowGroup で ModelContext を初期化し、WindowManager に渡す
+
+### ホットキー管理
+
+- **HotKeyManager.swift**: ホットキー設定の管理（シングルトン）
+  - UserDefaults でモディファイアキー (modifierFlags) とキーコード (keyCode) を永続化
+  - デフォルトは Control+I (keyCode 34)
+  - `matches(event:)` でイベントとの一致を判定
+  - `getHotKeyString()` でホットキーの表示用文字列を生成（⌃I など）
+
+### メニューバー
+
+- **MenuBarManager.swift**: メニューバーアイコンとメニューの管理（シングルトン）
+  - SF Symbols の "text.book.closed" アイコンを使用
+  - HotKeyManager の変更を Combine で監視し、メニューを自動更新
+  - メニュー項目: メモ表示/非表示、設定、終了
+  - 現在のホットキーをメニューに表示
 
 ### データ永続化
 
@@ -49,12 +67,17 @@ SwiftUI の標準 Window シーンではフルスクリーンアプリの上に�
 
 ### UI構造
 
-- NavigationSplitView: 左側にメモリスト、右側にエディタ
-- NSVisualEffectView (.hudWindow material) で半透明背景
-- SwiftUI toolbar API を使用（NSWindow 内で sceneBridgingOptions により有効化）
+- **ContentView.swift**: メインのメモ編集画面
+  - NavigationSplitView: 左側にメモリスト、右側にエディタ
+  - NSVisualEffectView (.hudWindow material) で半透明背景
+  - SwiftUI toolbar API を使用（NSWindow 内で sceneBridgingOptions により有効化）
+- **SettingsView.swift**: 設定画面
+  - HotKeyRecorderView でホットキーのカスタマイズ
+  - アプリ情報の表示
 
 ## 注意事項
 
 - アクセシビリティ権限: システム設定 > プライバシーとセキュリティ > アクセシビリティ でアプリを許可
-- ホットキーコード: Control+I は `event.keyCode == 34` で検出
+- ホットキーはユーザーが設定可能（デフォルトは Control+I、keyCode 34）
 - Product Name: "Flyt", Bundle ID: "void2610.Flyt"
+- 主要なマネージャークラスはすべてシングルトンパターン (WindowManager, HotKeyManager, MenuBarManager, AppState)
