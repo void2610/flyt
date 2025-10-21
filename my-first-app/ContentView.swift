@@ -1,27 +1,38 @@
 import SwiftUI
+import SwiftData
 
-// メモデータの構造体
-struct Note: Identifiable, Hashable {
-    let id = UUID()
+// メモデータのモデル(SwiftDataで永続化)
+@Model
+final class Note {
+    var id: UUID
     var title: String
     var content: String
     var updatedAt: Date
+
+    init(title: String, content: String, updatedAt: Date) {
+        self.id = UUID()
+        self.title = title
+        self.content = content
+        self.updatedAt = updatedAt
+    }
 }
 
 struct ContentView: View {
-    // メモのリスト
-    @State private var notes: [Note] = [
-        Note(title: "最初のメモ", content: "ここにメモを書いてください", updatedAt: Date())
-    ]
+    // SwiftDataからメモを取得
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
 
     // 選択中のメモ
     @State private var selectedNote: Note?
+
+    // アプリケーション状態
+    @EnvironmentObject var appState: AppState
 
     var body: some View {
         NavigationSplitView {
             // 左側: メモリスト
             List(selection: $selectedNote) {
-                ForEach($notes) { $note in
+                ForEach(notes) { note in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(note.title)
                             .font(.headline)
@@ -48,14 +59,14 @@ struct ContentView: View {
             }
         } detail: {
             // 右側: メモ編集エリア
-            if let index = notes.firstIndex(where: { $0.id == selectedNote?.id }) {
+            if let selectedNote = selectedNote {
                 VStack(spacing: 0) {
                     // タイトル入力
                     TextField("タイトル", text: Binding(
-                        get: { notes[index].title },
+                        get: { selectedNote.title },
                         set: { newValue in
-                            notes[index].title = newValue
-                            notes[index].updatedAt = Date()
+                            selectedNote.title = newValue
+                            selectedNote.updatedAt = Date()
                         }
                     ))
                     .font(.title)
@@ -65,19 +76,19 @@ struct ContentView: View {
 
                     // 本文入力
                     TextEditor(text: Binding(
-                        get: { notes[index].content },
+                        get: { selectedNote.content },
                         set: { newValue in
-                            notes[index].content = newValue
-                            notes[index].updatedAt = Date()
+                            selectedNote.content = newValue
+                            selectedNote.updatedAt = Date()
                         }
                     ))
                     .padding()
 
                     // 更新日時と文字数表示
                     HStack {
-                        Text("更新: \(notes[index].updatedAt, style: .time)")
+                        Text("更新: \(selectedNote.updatedAt, style: .time)")
                         Spacer()
-                        Text("文字数: \(notes[index].content.count)")
+                        Text("文字数: \(selectedNote.content.count)")
                     }
                     .font(.caption)
                     .foregroundColor(.gray)
@@ -85,13 +96,10 @@ struct ContentView: View {
                 }
                 .toolbar {
                     Button(role: .destructive, action: {
-                        if let selected = selectedNote {
-                            deleteNote(selected)
-                        }
+                        deleteNote(selectedNote)
                     }) {
                         Label("削除", systemImage: "trash")
                     }
-                    .disabled(selectedNote == nil)
                 }
             } else {
                 // メモが選択されていない場合
@@ -104,22 +112,25 @@ struct ContentView: View {
                 }
             }
         }
+        // Escキーで閉じる
+        .onKeyPress(.escape) {
+            NSApplication.shared.keyWindow?.close()
+            return .handled
+        }
     }
-
+    
     // 新規メモを追加
     private func addNewNote() {
         let newNote = Note(title: "新規メモ", content: "", updatedAt: Date())
-        notes.insert(newNote, at: 0)
+        modelContext.insert(newNote)
         selectedNote = newNote
     }
 
     // メモを削除
     private func deleteNote(_ note: Note) {
-        if let index = notes.firstIndex(where: { $0.id == note.id }) {
-            notes.remove(at: index)
-            if selectedNote?.id == note.id {
-                selectedNote = notes.first
-            }
+        modelContext.delete(note)
+        if selectedNote?.id == note.id {
+            selectedNote = notes.first
         }
     }
 }
