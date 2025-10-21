@@ -44,7 +44,7 @@ class WindowManager {
         window.titleVisibility = .visible
 
         // フルスクリーンアプリの上に表示するための設定
-        window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
+        window.level = .popUpMenu  // ポップアップメニューレベル（フルスクリーン上にも表示）
         window.collectionBehavior = [
             .canJoinAllSpaces,          // 全てのスペースで表示可能
             .fullScreenAuxiliary,       // フルスクリーンアプリの補助ウィンドウとして動作
@@ -82,16 +82,17 @@ class WindowManager {
 
     // アニメーション付きでウィンドウを表示
     private func showWindowWithAnimation(_ window: NSWindow) {
-        // ウィンドウレベルを再設定（フルスクリーンアプリの上に表示するため）
-        window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
-
-        // collectionBehaviorも再設定
+        // collectionBehaviorを先に設定
         window.collectionBehavior = [
             .canJoinAllSpaces,
             .fullScreenAuxiliary,
             .stationary,
             .ignoresCycle
         ]
+
+        // ウィンドウレベルを最高レベルに設定（フルスクリーンアプリの上に表示するため）
+        // CGShieldingWindowLevel() の代わりに .popUpMenu を使用
+        window.level = .popUpMenu
 
         // 現在アクティブなスペース（フルスクリーンアプリが表示されているスペース）を取得
         if let screen = NSScreen.main {
@@ -104,6 +105,8 @@ class WindowManager {
         }
 
         window.alphaValue = 0.0
+
+        // orderFront よりも先にレベルを設定
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 

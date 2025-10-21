@@ -46,7 +46,7 @@ class HotCornerManager: ObservableObject {
     private let triggerDelay: TimeInterval = 0.3
 
     // クールダウン時間（秒）
-    private let cooldownDuration: TimeInterval = 2.0
+    private let cooldownDuration: TimeInterval = 0.5
 
     // トリガーコールバック
     var onTrigger: (() -> Void)?
@@ -116,7 +116,7 @@ class HotCornerManager: ObservableObject {
         let mouseLocation = NSEvent.mouseLocation
         let screenFrame = screen.frame
 
-        // マウスがホットコーナーにあるかチェック
+        // マウスがホットエッジにあるかチェック
         if isInHotCorner(mouseLocation: mouseLocation, screenFrame: screenFrame) {
             // タイマーがまだ開始されていない場合のみ開始
             if triggerTimer == nil {
@@ -125,9 +125,10 @@ class HotCornerManager: ObservableObject {
                 }
             }
         } else {
-            // ホットコーナーから出たらタイマーをキャンセル
+            // ホットエッジから出たらタイマーをキャンセルし、クールダウンをリセット
             triggerTimer?.invalidate()
             triggerTimer = nil
+            lastTriggered = nil  // クールダウンをリセット
         }
     }
 
