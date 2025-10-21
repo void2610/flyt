@@ -46,12 +46,35 @@ class WindowManager {
         window.backgroundColor = .clear
         window.isOpaque = false
 
-        // SwiftUIビューをNSHostingViewでラップ
+        // NSVisualEffectViewで半透明背景を作成
+        let visualEffectView = NSVisualEffectView()
+        visualEffectView.material = .hudWindow
+        visualEffectView.blendingMode = .behindWindow
+        visualEffectView.state = .active
+        visualEffectView.wantsLayer = true
+
+        // SwiftUIビューをNSHostingViewでラップ（背景を透明に）
         let contentView = ContentView()
             .environment(\.modelContext, modelContext)
+            .background(Color.clear)
 
         let hostingView = NSHostingView(rootView: contentView)
-        window.contentView = hostingView
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+
+        // HostingViewの背景も透明に
+        hostingView.wantsLayer = true
+        hostingView.layer?.backgroundColor = NSColor.clear.cgColor
+
+        // VisualEffectViewの上にHostingViewを配置
+        visualEffectView.addSubview(hostingView)
+        NSLayoutConstraint.activate([
+            hostingView.topAnchor.constraint(equalTo: visualEffectView.topAnchor),
+            hostingView.leadingAnchor.constraint(equalTo: visualEffectView.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: visualEffectView.trailingAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: visualEffectView.bottomAnchor)
+        ])
+
+        window.contentView = visualEffectView
 
         self.noteWindow = window
     }

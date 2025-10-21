@@ -48,7 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             return self.handleKeyEvent(event, isLocal: true)
         }
-
+        
         // グローバルイベントモニター（他のアプリでも検出）
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
             _ = self.handleKeyEvent(event, isLocal: false)
