@@ -1,6 +1,6 @@
 //
-//  my_first_appApp.swift
-//  my-first-app
+//  FlytApp.swift
+//  Flyt
 //
 //  Created by Izumi Shuya on 2025/10/21.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct my_first_appApp: App {
+struct FlytApp: App {
     // AppDelegateを設定
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 

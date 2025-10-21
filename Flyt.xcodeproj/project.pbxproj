@@ -12,19 +12,19 @@
 			containerPortal = AE5D89B32EA790FC00C5A09C /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AE5D89BA2EA790FC00C5A09C;
-			remoteInfo = "my-first-app";
+			remoteInfo = Flyt;
 		};
 		AE5D89D92EA790FE00C5A09C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AE5D89B32EA790FC00C5A09C /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AE5D89BA2EA790FC00C5A09C;
-			remoteInfo = "my-first-app";
+			remoteInfo = Flyt;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AE5D89BB2EA790FC00C5A09C /* my-first-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "my-first-app.app"; path = Flyt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE5D89BB2EA790FC00C5A09C /* Flyt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Flyt.app"; path = Flyt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlytUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,7 +85,7 @@
 		AE5D89BC2EA790FC00C5A09C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AE5D89BB2EA790FC00C5A09C /* my-first-app.app */,
+				AE5D89BB2EA790FC00C5A09C /* Flyt.app */,
 				AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */,
 				AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */,
 			);
@@ -114,7 +114,7 @@
 			packageProductDependencies = (
 			);
 			productName = Flyt;
-			productReference = AE5D89BB2EA790FC00C5A09C /* my-first-app.app */;
+			productReference = AE5D89BB2EA790FC00C5A09C /* Flyt.app */;
 			productType = "com.apple.product-type.application";
 		};
 		AE5D89CD2EA790FE00C5A09C /* FlytTests */ = {
@@ -136,7 +136,7 @@
 			name = FlytTests;
 			packageProductDependencies = (
 			);
-			productName = "my-first-appTests";
+			productName = FlytTests;
 			productReference = AE5D89CE2EA790FE00C5A09C /* FlytTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -159,7 +159,7 @@
 			name = FlytUITests;
 			packageProductDependencies = (
 			);
-			productName = "my-first-appUITests";
+			productName = FlytUITests;
 			productReference = AE5D89D82EA790FE00C5A09C /* FlytUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -392,7 +392,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Flyt/my_first_app.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Flyt/Flyt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -418,7 +418,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Flyt/my_first_app.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Flyt/Flyt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -448,7 +448,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.FlytTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -465,7 +465,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.FlytTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -480,11 +480,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.FlytUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "my-first-app";
+				TEST_TARGET_NAME = Flyt;
 			};
 			name = Debug;
 		};
@@ -495,11 +495,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "void2610.my-first-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = void2610.FlytUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "my-first-app";
+				TEST_TARGET_NAME = Flyt;
 			};
 			name = Release;
 		};

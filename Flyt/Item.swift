@@ -1,6 +1,6 @@
 //
 //  Item.swift
-//  my-first-app
+//  Flyt
 //
 //  Created by Izumi Shuya on 2025/10/21.
 //

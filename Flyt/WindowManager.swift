@@ -1,6 +1,6 @@
 //
 //  WindowManager.swift
-//  my-first-app
+//  Flyt
 //
 //  フルスクリーンアプリの上に表示できるウィンドウを手動管理
 //

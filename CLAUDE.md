@@ -37,7 +37,7 @@ SwiftUI の標準 Window シーンではフルスクリーンアプリの上に�
    - アクセシビリティ権限が必要（初回起動時にダイアログ表示）
    - Timer による権限付与の自動検出とイベントモニターの再登録
 
-3. **my_first_appApp.swift**: エントリーポイント
+3. **FlytApp.swift**: エントリーポイント
    - `NSApp.setActivationPolicy(.accessory)` で Dock アイコンを非表示
    - ダミー WindowGroup で ModelContext を初期化し、WindowManager に渡す
 

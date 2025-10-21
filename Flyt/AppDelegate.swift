@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  my-first-app
+//  Flyt
 //
 //  グローバルキーボードショートカットを管理するクラス
 //

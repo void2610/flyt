@@ -1,13 +1,13 @@
 //
-//  my_first_appUITestsLaunchTests.swift
-//  my-first-appUITests
+//  FlytUITestsLaunchTests.swift
+//  FlytUITests
 //
 //  Created by Izumi Shuya on 2025/10/21.
 //
 
 import XCTest
 
-final class my_first_appUITestsLaunchTests: XCTestCase {
+final class FlytUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

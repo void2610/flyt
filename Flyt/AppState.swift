@@ -1,6 +1,6 @@
 //
 //  AppState.swift
-//  my-first-app
+//  Flyt
 //
 //  アプリケーション全体の状態を管理するクラス
 //
