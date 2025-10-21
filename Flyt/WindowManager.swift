@@ -45,7 +45,12 @@ class WindowManager {
 
         // フルスクリーンアプリの上に表示するための設定
         window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) + 1)
-        window.collectionBehavior = [.canJoinAllSpaces, .transient, .fullScreenAuxiliary]
+        window.collectionBehavior = [
+            .canJoinAllSpaces,          // 全てのスペースで表示可能
+            .fullScreenAuxiliary,       // フルスクリーンアプリの補助ウィンドウとして動作
+            .stationary,                // ウィンドウがスペース切り替えの影響を受けない
+            .ignoresCycle               // Cmd+Tab でのウィンドウ切り替えに含めない
+        ]
 
         // 追加設定
         window.hidesOnDeactivate = false
@@ -77,7 +82,16 @@ class WindowManager {
 
     // アニメーション付きでウィンドウを表示
     private func showWindowWithAnimation(_ window: NSWindow) {
-        window.center()
+        // 現在アクティブなスペース（フルスクリーンアプリが表示されているスペース）を取得
+        if let screen = NSScreen.main {
+            // スクリーンの中央にウィンドウを配置
+            let screenFrame = screen.visibleFrame
+            let windowFrame = window.frame
+            let x = screenFrame.midX - windowFrame.width / 2
+            let y = screenFrame.midY - windowFrame.height / 2
+            window.setFrameOrigin(NSPoint(x: x, y: y))
+        }
+
         window.alphaValue = 0.0
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
