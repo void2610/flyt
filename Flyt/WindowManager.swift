@@ -83,7 +83,7 @@ class WindowManager {
         NSApp.activate(ignoringOtherApps: true)
 
         NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.15
+            context.duration = 0.3
             window.animator().alphaValue = 1.0
         })
     }
@@ -91,7 +91,7 @@ class WindowManager {
     // アニメーション付きでウィンドウを非表示
     private func hideWindowWithAnimation(_ window: NSWindow) {
         NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.15
+            context.duration = 0.3
             window.animator().alphaValue = 0.0
         }, completionHandler: {
             window.orderOut(nil)
