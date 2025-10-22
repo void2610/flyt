@@ -111,15 +111,21 @@ class PomodoroManager: ObservableObject {
 
     // 現在のセッションを完了
     private func completeCurrentSession() {
+        // タイマーを停止
+        pause()
+
+        // ウィンドウを最前面に表示
+        showWindow()
+
         switch state {
         case .working:
-            // 作業完了 → 休憩へ
+            // 作業完了 → 休憩へ（一時停止状態）
             sessionCount += 1
             state = .resting
             remainingSeconds = restDurationMinutes * 60
 
         case .resting:
-            // 休憩完了 → 作業へ
+            // 休憩完了 → 作業へ（一時停止状態）
             state = .working
             remainingSeconds = workDurationMinutes * 60
 
@@ -127,10 +133,12 @@ class PomodoroManager: ObservableObject {
             // 何もしない
             break
         }
+    }
 
-        // タイマーを継続
-        if isRunning {
-            // 既にタイマーが動いているので何もしない
+    // ウィンドウを表示
+    private func showWindow() {
+        DispatchQueue.main.async {
+            WindowManager.shared.showWindow()
         }
     }
 

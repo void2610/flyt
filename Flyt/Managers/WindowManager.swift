@@ -76,6 +76,19 @@ class WindowManager {
         }
     }
 
+    // ウィンドウを表示（toggleではなく必ず表示）
+    func showWindow() {
+        guard let window = noteWindow else { return }
+
+        if !window.isVisible {
+            showWindowWithAnimation(window)
+        } else {
+            // 既に表示されている場合は最前面に
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
     // アニメーション付きでウィンドウを表示
     private func showWindowWithAnimation(_ window: NSWindow) {
         // collectionBehaviorを先に設定
