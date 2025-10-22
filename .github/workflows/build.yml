@@ -24,13 +24,19 @@ jobs:
       - name: Build app
         run: |
           # Xcode 26のAssetCatalogバグの回避策
-          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+          # クリーンビルドを実行し、並列処理を無効化
+          xcodebuild clean -project Flyt.xcodeproj \
+            -scheme Flyt \
+            -configuration Release
 
+          # AssetCatalogのコンパイルエラーを回避するため、
+          # -UseModernBuildSystemを無効化する
           xcodebuild -project Flyt.xcodeproj \
             -scheme Flyt \
             -configuration Release \
             -derivedDataPath ./build \
-            -IDEBuildOperationMaxNumberOfConcurrentCompileTasks=1 \
+            -jobs 1 \
+            ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
             build
 
       - name: Verify build
