@@ -20,10 +20,14 @@ jobs:
 
       - name: Build app
         run: |
+          # Xcode 26のAssetCatalogバグの回避策
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+
           xcodebuild -project Flyt.xcodeproj \
             -scheme Flyt \
             -configuration Release \
             -derivedDataPath ./build \
+            -IDEBuildOperationMaxNumberOfConcurrentCompileTasks=1 \
             build
 
       - name: Create app bundle
