@@ -47,9 +47,6 @@ class WindowManager {
         window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
         window.collectionBehavior = [
             .canJoinAllSpaces,          // 全てのスペースで表示可能
-            .fullScreenAuxiliary,       // フルスクリーンアプリの補助ウィンドウとして動作
-            .transient,                 // 一時的なウィンドウとして扱う
-            .ignoresCycle               // Cmd+Tab でのウィンドウ切り替えに含めない
         ]
 
         // 追加設定
