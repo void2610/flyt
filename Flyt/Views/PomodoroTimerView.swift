@@ -11,8 +11,9 @@ struct PomodoroTimerView: View {
     @ObservedObject var manager = PomodoroManager.shared
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                Spacer()
 
             // 状態表示
             Text(stateText)
@@ -60,6 +61,7 @@ struct PomodoroTimerView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
                 .opacity(manager.state == .idle ? 0.3 : 1.0)
                 .disabled(manager.state == .idle)
 
@@ -81,6 +83,7 @@ struct PomodoroTimerView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
 
                 // スキップボタン
                 Button(action: {
@@ -96,14 +99,31 @@ struct PomodoroTimerView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
                 .opacity(manager.state == .idle ? 0.3 : 1.0)
                 .disabled(manager.state == .idle)
             }
 
-            Spacer()
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(NSColor.windowBackgroundColor))
+
+            // 設定ボタン（右上）
+            Button(action: {
+                WindowManager.shared.showSettingsWindow()
+            }) {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(.secondary)
+                    .padding(12)
+                    .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .focusable(false)
+            .padding(16)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(NSColor.windowBackgroundColor))
     }
 
     // 状態に応じたテキスト

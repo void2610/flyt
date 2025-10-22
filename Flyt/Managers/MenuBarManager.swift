@@ -61,7 +61,7 @@ class MenuBarManager {
         // タイマーを表示/非表示
         let toggleItem = NSMenuItem(
             title: "タイマーを表示/非表示",
-            action: #selector(toggleNoteWindow),
+            action: #selector(toggleTimerWindow),
             keyEquivalent: ""
         )
         toggleItem.target = self
@@ -106,7 +106,7 @@ class MenuBarManager {
     }
 
     // タイマーウィンドウを表示/非表示
-    @objc private func toggleNoteWindow() {
+    @objc private func toggleTimerWindow() {
         WindowManager.shared.toggleWindow()
     }
 

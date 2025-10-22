@@ -1,5 +1,5 @@
 //
-//  HotCornerSettingsView.swift
+//  HotEdgeSettingsView.swift
 //  Flyt
 //
 //  ホットエッジ設定のビュー
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct HotCornerSettingsView: View {
-    @ObservedObject var manager = HotCornerManager.shared
+struct HotEdgeSettingsView: View {
+    @ObservedObject var manager = HotEdgeManager.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -16,7 +16,7 @@ struct HotCornerSettingsView: View {
             Toggle("ホットエッジを有効にする", isOn: Binding(
                 get: { manager.isEnabled },
                 set: { newValue in
-                    manager.updateSettings(corner: manager.selectedCorner, enabled: newValue)
+                    manager.updateSettings(edge: manager.selectedEdge, enabled: newValue)
                 }
             ))
 
@@ -28,20 +28,20 @@ struct HotCornerSettingsView: View {
                         .foregroundColor(.secondary)
 
                     Picker("", selection: Binding(
-                        get: { manager.selectedCorner },
+                        get: { manager.selectedEdge },
                         set: { newValue in
-                            manager.updateSettings(corner: newValue, enabled: manager.isEnabled)
+                            manager.updateSettings(edge: newValue, enabled: manager.isEnabled)
                         }
                     )) {
-                        ForEach(HotCorner.allCases, id: \.self) { corner in
-                            Text(corner.rawValue).tag(corner)
+                        ForEach(HotEdge.allCases, id: \.self) { edge in
+                            Text(edge.rawValue).tag(edge)
                         }
                     }
                     .pickerStyle(.menu)
                     .frame(width: 150)
 
                     // 視覚的なプレビュー
-                    HotCornerPreview(selectedCorner: manager.selectedCorner)
+                    HotEdgePreview(selectedEdge: manager.selectedEdge)
                         .frame(height: 120)
                         .padding(.top, 8)
                 }
@@ -106,8 +106,8 @@ struct HotCornerSettingsView: View {
 }
 
 // ホットエッジの視覚的なプレビュー
-struct HotCornerPreview: View {
-    let selectedCorner: HotCorner
+struct HotEdgePreview: View {
+    let selectedEdge: HotEdge
 
     var body: some View {
         ZStack {
@@ -122,27 +122,27 @@ struct HotCornerPreview: View {
             // 4つの辺にインジケーターを配置
             VStack(spacing: 0) {
                 // 上辺
-                EdgeIndicator(isActive: selectedCorner == .top, isHorizontal: true)
+                EdgeIndicator(isActive: selectedEdge == .top, isHorizontal: true)
                     .frame(height: 4)
 
                 Spacer()
 
                 HStack(spacing: 0) {
                     // 左辺
-                    EdgeIndicator(isActive: selectedCorner == .left, isHorizontal: false)
+                    EdgeIndicator(isActive: selectedEdge == .left, isHorizontal: false)
                         .frame(width: 4)
 
                     Spacer()
 
                     // 右辺
-                    EdgeIndicator(isActive: selectedCorner == .right, isHorizontal: false)
+                    EdgeIndicator(isActive: selectedEdge == .right, isHorizontal: false)
                         .frame(width: 4)
                 }
 
                 Spacer()
 
                 // 下辺
-                EdgeIndicator(isActive: selectedCorner == .bottom, isHorizontal: true)
+                EdgeIndicator(isActive: selectedEdge == .bottom, isHorizontal: true)
                     .frame(height: 4)
             }
             .padding(8)
@@ -166,7 +166,7 @@ struct EdgeIndicator: View {
 }
 
 #Preview {
-    HotCornerSettingsView()
+    HotEdgeSettingsView()
         .padding()
         .frame(width: 400)
 }

@@ -13,7 +13,7 @@ class WindowManager {
     static let shared = WindowManager()
 
     // タイマーウィンドウ
-    private var noteWindow: NSWindow?
+    private var timerWindow: NSWindow?
 
     // 設定ウィンドウ
     private var settingsWindow: NSWindow?
@@ -21,7 +21,7 @@ class WindowManager {
     private init() {}
 
     // タイマーウィンドウを作成
-    func createNoteWindow() {
+    func createTimerWindow() {
         // ウィンドウのサイズと位置
         let windowRect = NSRect(x: 0, y: 0, width: 600, height: 350)
 
@@ -62,12 +62,12 @@ class WindowManager {
 
         window.contentView = hostingView
 
-        self.noteWindow = window
+        self.timerWindow = window
     }
 
     // ウィンドウの表示/非表示を切り替え
     func toggleWindow() {
-        guard let window = noteWindow else { return }
+        guard let window = timerWindow else { return }
 
         if window.isVisible {
             hideWindowWithAnimation(window)
@@ -78,7 +78,7 @@ class WindowManager {
 
     // ウィンドウを表示（toggleではなく必ず表示）
     func showWindow() {
-        guard let window = noteWindow else { return }
+        guard let window = timerWindow else { return }
 
         if !window.isVisible {
             showWindowWithAnimation(window)
@@ -138,8 +138,8 @@ class WindowManager {
 
     // ウィンドウを閉じる
     func closeWindow() {
-        noteWindow?.close()
-        noteWindow = nil
+        timerWindow?.close()
+        timerWindow = nil
     }
 
     // 設定ウィンドウを作成

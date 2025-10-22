@@ -19,7 +19,7 @@ struct HotEdgeSettingsTab: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                HotCornerSettingsView()
+                HotEdgeSettingsView()
             }
             .padding(30)
             .frame(maxWidth: .infinity, alignment: .leading)

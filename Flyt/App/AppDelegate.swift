@@ -22,8 +22,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         MenuBarManager.shared.setupMenuBar()
         // イベントモニターを設定
         setupEventMonitors()
-        // ホットコーナーマネージャーをセットアップ
-        setupHotCorner()
+        // ホットエッジマネージャーをセットアップ
+        setupHotEdge()
 
         // 権限がない場合、定期的にチェックして自動的にイベントモニターを再登録
         if !AXIsProcessTrusted() {
@@ -63,7 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func handleKeyEvent(_ event: NSEvent, isLocal: Bool) -> NSEvent? {
         if HotKeyManager.shared.matches(event: event) {
             DispatchQueue.main.async {
-                self.toggleNoteWindow()
+                self.toggleTimerWindow()
             }
             return nil // イベントを消費
         }
@@ -105,26 +105,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // ホットエッジをセットアップ
-    private func setupHotCorner() {
+    private func setupHotEdge() {
         // ホットエッジのトリガーコールバックを設定
-        HotCornerManager.shared.onTrigger = { [weak self] in
+        HotEdgeManager.shared.onTrigger = { [weak self] in
             DispatchQueue.main.async {
-                self?.toggleNoteWindow()
+                self?.toggleTimerWindow()
             }
         }
 
         // 監視を開始
-        HotCornerManager.shared.startMonitoring()
+        HotEdgeManager.shared.startMonitoring()
     }
 
     // タイマーウィンドウを開く/閉じる
-    private func toggleNoteWindow() {
+    private func toggleTimerWindow() {
         WindowManager.shared.toggleWindow()
     }
 
     // WindowManagerでウィンドウを初期化
     func initializeWindow() {
-        WindowManager.shared.createNoteWindow()
+        WindowManager.shared.createTimerWindow()
     }
 
     // 権限の監視を停止
@@ -143,7 +143,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // ホットエッジ監視を停止
-        HotCornerManager.shared.stopMonitoring()
+        HotEdgeManager.shared.stopMonitoring()
 
         // タイマーをクリーンアップ
         stopPermissionMonitoring()

@@ -1,5 +1,5 @@
 //
-//  HotCornerManager.swift
+//  HotEdgeManager.swift
 //  Flyt
 //
 //  ホットエッジ（画面の辺）の設定を管理するクラス
@@ -9,7 +9,7 @@ import AppKit
 import SwiftUI
 
 // ホットエッジの位置
-enum HotCorner: String, CaseIterable, Codable {
+enum HotEdge: String, CaseIterable, Codable {
     case top = "上"
     case bottom = "下"
     case left = "左"
@@ -17,21 +17,21 @@ enum HotCorner: String, CaseIterable, Codable {
     case disabled = "無効"
 }
 
-class HotCornerManager: ObservableObject {
+class HotEdgeManager: ObservableObject {
     // シングルトンインスタンス
-    static let shared = HotCornerManager()
+    static let shared = HotEdgeManager()
 
     // ホットエッジの設定
-    @Published var selectedCorner: HotCorner = .disabled
+    @Published var selectedEdge: HotEdge = .disabled
     @Published var isEnabled: Bool = false
     @Published var edgeThreshold: CGFloat = 3.0  // ホットエッジの判定幅（ピクセル）
     @Published var triggerDelay: TimeInterval = 0.3  // トリガーまでの遅延時間（秒）
 
     // UserDefaultsのキー
-    private let selectedCornerKey = "HotCornerSelectedCorner"
-    private let isEnabledKey = "HotCornerIsEnabled"
-    private let edgeThresholdKey = "HotCornerEdgeThreshold"
-    private let triggerDelayKey = "HotCornerTriggerDelay"
+    private let selectedEdgeKey = "HotEdgeSelectedEdge"
+    private let isEnabledKey = "HotEdgeIsEnabled"
+    private let edgeThresholdKey = "HotEdgeEdgeThreshold"
+    private let triggerDelayKey = "HotEdgeTriggerDelay"
 
     // マウスイベントモニター（グローバルとローカル）
     private var globalMouseMonitor: Any?
@@ -55,7 +55,7 @@ class HotCornerManager: ObservableObject {
 
     // 設定を保存
     func saveSettings() {
-        UserDefaults.standard.set(selectedCorner.rawValue, forKey: selectedCornerKey)
+        UserDefaults.standard.set(selectedEdge.rawValue, forKey: selectedEdgeKey)
         UserDefaults.standard.set(isEnabled, forKey: isEnabledKey)
         UserDefaults.standard.set(Double(edgeThreshold), forKey: edgeThresholdKey)
         UserDefaults.standard.set(triggerDelay, forKey: triggerDelayKey)
@@ -63,9 +63,9 @@ class HotCornerManager: ObservableObject {
 
     // 設定を読み込み
     func loadSettings() {
-        if let savedCorner = UserDefaults.standard.string(forKey: selectedCornerKey),
-           let corner = HotCorner(rawValue: savedCorner) {
-            selectedCorner = corner
+        if let savedEdge = UserDefaults.standard.string(forKey: selectedEdgeKey),
+           let edge = HotEdge(rawValue: savedEdge) {
+            selectedEdge = edge
         }
         isEnabled = UserDefaults.standard.bool(forKey: isEnabledKey)
 
@@ -84,7 +84,7 @@ class HotCornerManager: ObservableObject {
 
     // マウス監視を開始
     func startMonitoring() {
-        guard isEnabled && selectedCorner != .disabled else {
+        guard isEnabled && selectedEdge != .disabled else {
             stopMonitoring()
             return
         }
@@ -129,11 +129,11 @@ class HotCornerManager: ObservableObject {
         let screenFrame = screen.frame
 
         // マウスがホットエッジにあるかチェック
-        if isInHotCorner(mouseLocation: mouseLocation, screenFrame: screenFrame) {
+        if isInHotEdge(mouseLocation: mouseLocation, screenFrame: screenFrame) {
             // タイマーがまだ開始されていない場合のみ開始
             if triggerTimer == nil {
                 triggerTimer = Timer.scheduledTimer(withTimeInterval: triggerDelay, repeats: false) { [weak self] _ in
-                    self?.triggerHotCorner()
+                    self?.triggerHotEdge()
                 }
             }
         } else {
@@ -145,8 +145,8 @@ class HotCornerManager: ObservableObject {
     }
 
     // マウスがホットエッジにあるかチェック
-    private func isInHotCorner(mouseLocation: CGPoint, screenFrame: CGRect) -> Bool {
-        switch selectedCorner {
+    private func isInHotEdge(mouseLocation: CGPoint, screenFrame: CGRect) -> Bool {
+        switch selectedEdge {
         case .top:
             return mouseLocation.y >= screenFrame.maxY - edgeThreshold
         case .bottom:
@@ -160,8 +160,8 @@ class HotCornerManager: ObservableObject {
         }
     }
 
-    // ホットコーナーをトリガー
-    private func triggerHotCorner() {
+    // ホットエッジをトリガー
+    private func triggerHotEdge() {
         // クールダウン中かチェック
         if let lastTriggered = lastTriggered,
            Date().timeIntervalSince(lastTriggered) < cooldownDuration {
@@ -177,13 +177,13 @@ class HotCornerManager: ObservableObject {
     }
 
     // 設定を変更
-    func updateSettings(corner: HotCorner, enabled: Bool) {
-        selectedCorner = corner
+    func updateSettings(edge: HotEdge, enabled: Bool) {
+        selectedEdge = edge
         isEnabled = enabled
         saveSettings()
 
         // 監視を再開
-        if enabled && corner != .disabled {
+        if enabled && edge != .disabled {
             startMonitoring()
         } else {
             stopMonitoring()
