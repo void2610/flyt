@@ -9,6 +9,14 @@ import SwiftUI
 
 struct GeneralSettingsTab: View {
     @ObservedObject var pomodoroManager = PomodoroManager.shared
+    @State private var workText: String = ""
+    @State private var restText: String = ""
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case work
+        case rest
+    }
 
     var body: some View {
         ScrollView {
@@ -25,11 +33,23 @@ struct GeneralSettingsTab: View {
                     Text("作業時間")
                         .font(.headline)
                     Spacer()
-                    Stepper(
-                        "\(pomodoroManager.workDurationMinutes)分",
-                        value: $pomodoroManager.workDurationMinutes,
-                        in: 1...120
-                    )
+                    HStack(spacing: 4) {
+                        TextField("", text: $workText)
+                            .textFieldStyle(.plain)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 40)
+                            .focused($focusedField, equals: .work)
+                            .onSubmit {
+                                updateWorkDuration()
+                            }
+                            .onChange(of: focusedField) { oldValue, newValue in
+                                if oldValue == .work && newValue != .work {
+                                    updateWorkDuration()
+                                }
+                            }
+                        Text("分")
+                            .foregroundColor(.secondary)
+                    }
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
@@ -37,6 +57,9 @@ struct GeneralSettingsTab: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
                 )
+                .onAppear {
+                    workText = "\(pomodoroManager.workDurationMinutes)"
+                }
 
                 // 休憩時間設定
                 HStack {
@@ -46,11 +69,23 @@ struct GeneralSettingsTab: View {
                     Text("休憩時間")
                         .font(.headline)
                     Spacer()
-                    Stepper(
-                        "\(pomodoroManager.restDurationMinutes)分",
-                        value: $pomodoroManager.restDurationMinutes,
-                        in: 1...60
-                    )
+                    HStack(spacing: 4) {
+                        TextField("", text: $restText)
+                            .textFieldStyle(.plain)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 40)
+                            .focused($focusedField, equals: .rest)
+                            .onSubmit {
+                                updateRestDuration()
+                            }
+                            .onChange(of: focusedField) { oldValue, newValue in
+                                if oldValue == .rest && newValue != .rest {
+                                    updateRestDuration()
+                                }
+                            }
+                        Text("分")
+                            .foregroundColor(.secondary)
+                    }
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
@@ -58,6 +93,9 @@ struct GeneralSettingsTab: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
                 )
+                .onAppear {
+                    restText = "\(pomodoroManager.restDurationMinutes)"
+                }
 
                 Divider()
                     .padding(.vertical, 8)
@@ -114,6 +152,26 @@ struct GeneralSettingsTab: View {
             .frame(maxWidth: 450)
         }
         .frame(minWidth: 500, minHeight: 400)
+    }
+
+    // 作業時間を更新
+    private func updateWorkDuration() {
+        if let value = Int(workText), value >= 1, value <= 120 {
+            pomodoroManager.workDurationMinutes = value
+        } else {
+            // 無効な値の場合は元に戻す
+            workText = "\(pomodoroManager.workDurationMinutes)"
+        }
+    }
+
+    // 休憩時間を更新
+    private func updateRestDuration() {
+        if let value = Int(restText), value >= 1, value <= 60 {
+            pomodoroManager.restDurationMinutes = value
+        } else {
+            // 無効な値の場合は元に戻す
+            restText = "\(pomodoroManager.restDurationMinutes)"
+        }
     }
 }
 
