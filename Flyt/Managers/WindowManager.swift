@@ -23,7 +23,7 @@ class WindowManager {
     // タイマーウィンドウを作成
     func createNoteWindow() {
         // ウィンドウのサイズと位置
-        let windowRect = NSRect(x: 0, y: 0, width: 600, height: 500)
+        let windowRect = NSRect(x: 0, y: 0, width: 600, height: 350)
 
         // NSWindowを手動で作成
         let window = NSWindow(

@@ -16,35 +16,36 @@ struct PomodoroTimerView: View {
 
             // 状態表示
             Text(stateText)
-                .font(.title2)
+                .font(.title3)
                 .fontWeight(.medium)
-                .foregroundColor(stateColor)
-                .padding(.bottom, 20)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 8)
 
             // 時間表示
             Text(manager.getTimeString())
-                .font(.system(size: 120, weight: .thin, design: .rounded))
+                .font(.system(size: 100, weight: .thin, design: .rounded))
                 .monospacedDigit()
                 .foregroundColor(stateColor)
-                .padding(.bottom, 30)
+                .padding(.bottom, 12)
 
             // セッション数
             if manager.sessionCount > 0 {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
                         .foregroundColor(.green)
                     Text("完了: \(manager.sessionCount)セッション")
-                        .font(.body)
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.bottom, 40)
+                .padding(.bottom, 20)
             } else {
                 Spacer()
-                    .frame(height: 62)
+                    .frame(height: 36)
             }
 
             // コントロールボタン
-            HStack(spacing: 30) {
+            HStack(spacing: 25) {
                 // リセットボタン
                 Button(action: {
                     manager.reset()
@@ -52,9 +53,9 @@ struct PomodoroTimerView: View {
                     ZStack {
                         Circle()
                             .fill(Color(NSColor.controlBackgroundColor))
-                            .frame(width: 60, height: 60)
+                            .frame(width: 50, height: 50)
                         Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 24))
+                            .font(.system(size: 20))
                             .foregroundColor(.secondary)
                     }
                 }
@@ -72,11 +73,11 @@ struct PomodoroTimerView: View {
                 }) {
                     ZStack {
                         Circle()
-                            .fill(stateColor.opacity(0.15))
-                            .frame(width: 80, height: 80)
+                            .fill(Color(NSColor.controlBackgroundColor))
+                            .frame(width: 70, height: 70)
                         Image(systemName: manager.isRunning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(stateColor)
+                            .font(.system(size: 28))
+                            .foregroundColor(.primary)
                     }
                 }
                 .buttonStyle(.plain)
@@ -88,9 +89,9 @@ struct PomodoroTimerView: View {
                     ZStack {
                         Circle()
                             .fill(Color(NSColor.controlBackgroundColor))
-                            .frame(width: 60, height: 60)
+                            .frame(width: 50, height: 50)
                         Image(systemName: "forward.fill")
-                            .font(.system(size: 24))
+                            .font(.system(size: 20))
                             .foregroundColor(.secondary)
                     }
                 }
