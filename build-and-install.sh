@@ -26,4 +26,3 @@ echo "🚀 Flytアプリを起動中..."
 open /Applications/Flyt.app
 
 echo "✅ 完了！"
-echo "💡 Control+I でメモウィンドウを開きます"

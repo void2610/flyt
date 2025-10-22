@@ -20,6 +20,10 @@ xcodebuild -project Flyt.xcodeproj -scheme Flyt -configuration Release build
 - アクセシビリティ権限の永続化のため、`build-and-install.sh` を使用して `/Applications` にインストールすることを推奨
 - DerivedData からの実行では、ビルドごとにアクセシビリティ権限の再付与が必要になる
 
+## 開発ワークフロー
+
+**重要**: コードファイル（.swift）を編集した後は、必ず `bash build-and-install.sh` を実行してビルドとインストールを行ってください。
+
 ## アーキテクチャ
 
 ### フルスクリーン対応の実装

@@ -141,7 +141,7 @@ class WindowManager {
         }
 
         // ウィンドウのサイズと位置
-        let windowRect = NSRect(x: 0, y: 0, width: 400, height: 500)
+        let windowRect = NSRect(x: 0, y: 0, width: 600, height: 450)
 
         // NSWindowを手動で作成
         let window = NSWindow(
