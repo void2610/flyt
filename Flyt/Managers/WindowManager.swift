@@ -25,10 +25,10 @@ class WindowManager {
         // ウィンドウのサイズと位置
         let windowRect = NSRect(x: 0, y: 0, width: 600, height: 350)
 
-        // NSWindowを手動で作成
-        let window = NSWindow(
+        // NSPanelを使用（フルスクリーンアプリの上に安定して表示するため）
+        let window = NSPanel(
             contentRect: windowRect,
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -43,10 +43,13 @@ class WindowManager {
         window.titleVisibility = .visible
 
         // フルスクリーンアプリの上に表示するための設定
-        // CGShieldingWindowLevel() は最も高いウィンドウレベルの一つ
-        window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
+        // NSPanel + .nonactivatingPanel + .floating でフルスクリーン上に安定表示
+        window.level = .floating
         window.collectionBehavior = [
             .canJoinAllSpaces,          // 全てのスペースで表示可能
+            .fullScreenAuxiliary,       // フルスクリーンアプリと一緒に表示
+            .transient,                 // 一時的なウィンドウとして扱う
+            .ignoresCycle               // Cmd+Tabのサイクルから除外
         ]
 
         // 追加設定
@@ -96,8 +99,9 @@ class WindowManager {
             .ignoresCycle
         ]
 
-        // ウィンドウレベルを最高レベルに設定（フルスクリーンアプリの上に表示するため）
-        let shieldingLevel = Int(CGShieldingWindowLevel())
+        // ウィンドウレベルを明示的に設定（フルスクリーンアプリの上に表示するため）
+        // NSPanel + .floating で安定した動作を保証
+        window.level = .floating
 
         // 現在アクティブなスペース（フルスクリーンアプリが表示されているスペース）を取得
         if let screen = NSScreen.main {
@@ -111,7 +115,7 @@ class WindowManager {
 
         window.alphaValue = 0.0
 
-        // orderFront よりも先にレベルを設定
+        // ウィンドウを表示
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 
