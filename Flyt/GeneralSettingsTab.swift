@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct GeneralSettingsTab: View {
+    @FocusState private var isQuitButtonFocused: Bool
+
     var body: some View {
         Form {
             Section {
@@ -16,14 +18,25 @@ struct GeneralSettingsTab: View {
                     .fontWeight(.semibold)
                     .padding(.bottom, 8)
 
-                // 将来の拡張用プレースホルダー
-                Text("現在設定項目はありません")
-                    .foregroundColor(.secondary)
-                    .padding(.vertical, 20)
+                // アプリ終了ボタン
+                Button(action: {
+                    NSApplication.shared.terminate(nil)
+                }) {
+                    Text("アプリを終了")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .focused($isQuitButtonFocused)
+                .padding(.vertical, 10)
             }
         }
         .formStyle(.grouped)
         .frame(minWidth: 500, minHeight: 400)
+        .onAppear {
+            // ビューが表示されたらボタンにフォーカスを当てる
+            isQuitButtonFocused = true
+        }
     }
 }
 
