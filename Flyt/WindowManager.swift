@@ -44,11 +44,12 @@ class WindowManager {
         window.titleVisibility = .visible
 
         // フルスクリーンアプリの上に表示するための設定
-        window.level = .popUpMenu  // ポップアップメニューレベル（フルスクリーン上にも表示）
+        // CGShieldingWindowLevel() は最も高いウィンドウレベルの一つ
+        window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
         window.collectionBehavior = [
             .canJoinAllSpaces,          // 全てのスペースで表示可能
             .fullScreenAuxiliary,       // フルスクリーンアプリの補助ウィンドウとして動作
-            .stationary,                // ウィンドウがスペース切り替えの影響を受けない
+            .transient,                 // 一時的なウィンドウとして扱う
             .ignoresCycle               // Cmd+Tab でのウィンドウ切り替えに含めない
         ]
 
@@ -86,13 +87,12 @@ class WindowManager {
         window.collectionBehavior = [
             .canJoinAllSpaces,
             .fullScreenAuxiliary,
-            .stationary,
+            .transient,
             .ignoresCycle
         ]
 
         // ウィンドウレベルを最高レベルに設定（フルスクリーンアプリの上に表示するため）
-        // CGShieldingWindowLevel() の代わりに .popUpMenu を使用
-        window.level = .popUpMenu
+        let shieldingLevel = Int(CGShieldingWindowLevel())
 
         // 現在アクティブなスペース（フルスクリーンアプリが表示されているスペース）を取得
         if let screen = NSScreen.main {
