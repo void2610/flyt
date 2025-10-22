@@ -32,7 +32,6 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("ホットエッジ")
                         .font(.headline)
-
                     HotCornerSettingsView()
                 }
 

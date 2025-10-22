@@ -10,11 +10,9 @@ import SwiftUI
 import SwiftData
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    // イベントモニター（ローカルとグローバル）
     private var localEventMonitor: Any?
     private var globalEventMonitor: Any?
 
-    // ModelContext（ウィンドウ作成用）
     var modelContext: ModelContext?
 
     // 権限チェック用タイマー
@@ -23,20 +21,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // アクセサリアプリケーションとして動作（Dockアイコンを非表示）
         NSApp.setActivationPolicy(.accessory)
-
         // メニューバーアイコンをセットアップ
         MenuBarManager.shared.setupMenuBar()
-
         // イベントモニターを設定
         setupEventMonitors()
-
         // ホットコーナーマネージャーをセットアップ
         setupHotCorner()
 
         // 権限がない場合、定期的にチェックして自動的にイベントモニターを再登録
         if !AXIsProcessTrusted() {
             checkAccessibilityPermission()
-            startPermissionMonitoring()
+
+            permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                if AXIsProcessTrusted() {
+                    self?.setupEventMonitors()
+                    self?.stopPermissionMonitoring()
+                }
+            }
         }
     }
 
@@ -54,39 +55,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             return self.handleKeyEvent(event, isLocal: true)
         }
-        
+
         // グローバルイベントモニター（他のアプリでも検出）
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
             _ = self.handleKeyEvent(event, isLocal: false)
         }
     }
 
-    // 権限の監視を開始
-    private func startPermissionMonitoring() {
-        // 1秒ごとに権限をチェック
-        permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            if AXIsProcessTrusted() {
-                // 権限が付与されたらイベントモニターを再登録
-                self?.setupEventMonitors()
-                self?.stopPermissionMonitoring()
-            }
-        }
-    }
-
-    // 権限の監視を停止
-    private func stopPermissionMonitoring() {
-        permissionCheckTimer?.invalidate()
-        permissionCheckTimer = nil
-    }
-
-    // キーイベント処理
+    // 設定されたホットキーと一致した場合にメモウィンドウをトグル
     private func handleKeyEvent(_ event: NSEvent, isLocal: Bool) -> NSEvent? {
-        // 設定されたホットキーと一致するかチェック
         if HotKeyManager.shared.matches(event: event) {
             DispatchQueue.main.async {
                 self.toggleNoteWindow()
             }
-            return isLocal ? nil : event // ローカルの場合はイベントを消費
+            return nil // イベントを消費
         }
         return event
     }
@@ -99,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let accessEnabled = AXIsProcessTrustedWithOptions(options)
 
         if !accessEnabled {
-            // 初回のみアラートを表示
+            // アラートを表示
             showAccessibilityPermissionAlert()
         }
 
@@ -111,27 +93,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.async {
             let alert = NSAlert()
             alert.messageText = "アクセシビリティ権限が必要です"
-            alert.informativeText = """
-            フルスクリーンアプリ上でもキーボードショートカット（Control+I）を使用するには、アクセシビリティ権限が必要です。
-
-            システム設定でこのアプリを見つけてトグルをオンにしてください。
-            権限を付与すると自動的に有効になります（再起動不要）。
-            """
+            alert.informativeText = "本アプリの機能を使用するには、アクセシビリティ権限が必要です。"
             alert.alertStyle = .informational
             alert.addButton(withTitle: "システム設定を開く")
             alert.addButton(withTitle: "後で")
 
             let response = alert.runModal()
             if response == .alertFirstButtonReturn {
-                self.openAccessibilitySettings()
+                // アクセシビリティ設定を直接開く
+                let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+                NSWorkspace.shared.open(url)
             }
         }
-    }
-
-    // アクセシビリティ設定を直接開く
-    private func openAccessibilitySettings() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-        NSWorkspace.shared.open(url)
     }
 
     // ホットエッジをセットアップ
@@ -156,6 +129,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func initializeWindow(modelContext: ModelContext) {
         self.modelContext = modelContext
         WindowManager.shared.createNoteWindow(modelContext: modelContext)
+    }
+
+    // 権限の監視を停止
+    private func stopPermissionMonitoring() {
+        permissionCheckTimer?.invalidate()
+        permissionCheckTimer = nil
     }
 
     func applicationWillTerminate(_ notification: Notification) {
