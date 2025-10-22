@@ -44,19 +44,19 @@ struct PomodoroTimerView: View {
             }
 
             // コントロールボタン
-            HStack(spacing: 20) {
+            HStack(spacing: 30) {
                 // リセットボタン
                 Button(action: {
                     manager.reset()
                 }) {
-                    VStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(NSColor.controlBackgroundColor))
+                            .frame(width: 60, height: 60)
                         Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 28))
-                        Text("リセット")
-                            .font(.caption)
+                            .font(.system(size: 24))
+                            .foregroundColor(.secondary)
                     }
-                    .foregroundColor(.secondary)
-                    .frame(width: 80)
                 }
                 .buttonStyle(.plain)
                 .opacity(manager.state == .idle ? 0.3 : 1.0)
@@ -70,15 +70,14 @@ struct PomodoroTimerView: View {
                         manager.start()
                     }
                 }) {
-                    VStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(stateColor.opacity(0.15))
+                            .frame(width: 80, height: 80)
                         Image(systemName: manager.isRunning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 36))
-                        Text(manager.isRunning ? "停止" : "開始")
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 32))
+                            .foregroundColor(stateColor)
                     }
-                    .foregroundColor(stateColor)
-                    .frame(width: 100)
                 }
                 .buttonStyle(.plain)
 
@@ -86,14 +85,14 @@ struct PomodoroTimerView: View {
                 Button(action: {
                     manager.skipToNext()
                 }) {
-                    VStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(NSColor.controlBackgroundColor))
+                            .frame(width: 60, height: 60)
                         Image(systemName: "forward.fill")
-                            .font(.system(size: 28))
-                        Text("スキップ")
-                            .font(.caption)
+                            .font(.system(size: 24))
+                            .foregroundColor(.secondary)
                     }
-                    .foregroundColor(.secondary)
-                    .frame(width: 80)
                 }
                 .buttonStyle(.plain)
                 .opacity(manager.state == .idle ? 0.3 : 1.0)
