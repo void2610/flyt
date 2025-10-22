@@ -11,27 +11,23 @@ struct GeneralSettingsTab: View {
     @FocusState private var isQuitButtonFocused: Bool
 
     var body: some View {
-        Form {
-            Section {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
                 Text("一般設定")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .padding(.bottom, 8)
 
                 // アプリ終了ボタン
                 Button(action: {
                     NSApplication.shared.terminate(nil)
                 }) {
                     Text("アプリを終了")
-                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
                 .focused($isQuitButtonFocused)
-                .padding(.vertical, 10)
             }
+            .padding(30)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .formStyle(.grouped)
         .frame(minWidth: 500, minHeight: 400)
         .onAppear {
             // ビューが表示されたらボタンにフォーカスを当てる

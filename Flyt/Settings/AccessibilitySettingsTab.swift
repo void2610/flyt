@@ -12,17 +12,15 @@ struct AccessibilitySettingsTab: View {
     @State private var hasAccessibilityPermission = AXIsProcessTrusted()
 
     var body: some View {
-        Form {
-            Section {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
                 Text("アクセシビリティ")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .padding(.bottom, 8)
 
                 Text("グローバルキーボードショートカットとホットエッジを使用するには、アクセシビリティ権限が必要です")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .padding(.bottom, 12)
 
                 // 権限状態の表示
                 HStack {
@@ -45,7 +43,6 @@ struct AccessibilitySettingsTab: View {
                         }
                     }
                 }
-                .padding(.vertical, 8)
 
                 Divider()
 
@@ -65,7 +62,6 @@ struct AccessibilitySettingsTab: View {
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-                .padding(.vertical, 8)
 
                 // 権限チェックボタン
                 Button(action: {
@@ -76,10 +72,10 @@ struct AccessibilitySettingsTab: View {
                         Text("権限状態を再確認")
                     }
                 }
-                .padding(.top, 8)
             }
+            .padding(30)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .formStyle(.grouped)
         .frame(minWidth: 500, minHeight: 400)
         .onAppear {
             hasAccessibilityPermission = AXIsProcessTrusted()
