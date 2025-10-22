@@ -26,16 +26,39 @@ class PomodoroManager: ObservableObject {
     @Published var sessionCount: Int = 0
     @Published var isRunning: Bool = false
 
-    // タイマー設定（固定）
-    private let workDuration: Int = 30 * 60      // 30分
-    private let restDuration: Int = 10 * 60      // 10分
+    // タイマー設定（分単位）
+    @Published var workDurationMinutes: Int = 30 {
+        didSet {
+            UserDefaults.standard.set(workDurationMinutes, forKey: "workDurationMinutes")
+            // 待機中の場合は時間を更新
+            if state == .idle {
+                remainingSeconds = workDurationMinutes * 60
+            }
+        }
+    }
+    @Published var restDurationMinutes: Int = 10 {
+        didSet {
+            UserDefaults.standard.set(restDurationMinutes, forKey: "restDurationMinutes")
+        }
+    }
 
     // タイマー
     private var timer: Timer?
 
     private init() {
+        // UserDefaultsから設定を読み込み
+        let savedWork = UserDefaults.standard.integer(forKey: "workDurationMinutes")
+        let savedRest = UserDefaults.standard.integer(forKey: "restDurationMinutes")
+
+        if savedWork > 0 {
+            workDurationMinutes = savedWork
+        }
+        if savedRest > 0 {
+            restDurationMinutes = savedRest
+        }
+
         // 初期化時は作業時間を設定
-        remainingSeconds = workDuration
+        remainingSeconds = workDurationMinutes * 60
     }
 
     // タイマーを開始
@@ -45,7 +68,7 @@ class PomodoroManager: ObservableObject {
         // 待機中の場合は作業モードから開始
         if state == .idle {
             state = .working
-            remainingSeconds = workDuration
+            remainingSeconds = workDurationMinutes * 60
         }
 
         isRunning = true
@@ -67,7 +90,7 @@ class PomodoroManager: ObservableObject {
     func reset() {
         pause()
         state = .idle
-        remainingSeconds = workDuration
+        remainingSeconds = workDurationMinutes * 60
         sessionCount = 0
     }
 
@@ -93,12 +116,12 @@ class PomodoroManager: ObservableObject {
             // 作業完了 → 休憩へ
             sessionCount += 1
             state = .resting
-            remainingSeconds = restDuration
+            remainingSeconds = restDurationMinutes * 60
 
         case .resting:
             // 休憩完了 → 作業へ
             state = .working
-            remainingSeconds = workDuration
+            remainingSeconds = workDurationMinutes * 60
 
         case .idle:
             // 何もしない
@@ -123,11 +146,11 @@ class PomodoroManager: ObservableObject {
         let totalSeconds: Int
         switch state {
         case .working:
-            totalSeconds = workDuration
+            totalSeconds = workDurationMinutes * 60
         case .resting:
-            totalSeconds = restDuration
+            totalSeconds = restDurationMinutes * 60
         case .idle:
-            totalSeconds = workDuration
+            totalSeconds = workDurationMinutes * 60
         }
 
         return 1.0 - (Double(remainingSeconds) / Double(totalSeconds))

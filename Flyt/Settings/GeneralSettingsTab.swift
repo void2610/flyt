@@ -17,33 +17,40 @@ struct GeneralSettingsTab: View {
                     .font(.title2)
                     .fontWeight(.semibold)
 
-                // 時間設定の説明
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Image(systemName: "timer")
-                            .foregroundColor(.red)
-                            .font(.title3)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("作業時間")
-                                .font(.headline)
-                            Text("30分")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                // 作業時間設定
+                HStack {
+                    Image(systemName: "timer")
+                        .foregroundColor(.red)
+                        .font(.title3)
+                    Text("作業時間")
+                        .font(.headline)
+                    Spacer()
+                    Stepper(
+                        "\(pomodoroManager.workDurationMinutes)分",
+                        value: $pomodoroManager.workDurationMinutes,
+                        in: 1...120
+                    )
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
 
-                    HStack {
-                        Image(systemName: "cup.and.saucer")
-                            .foregroundColor(.green)
-                            .font(.title3)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("休憩時間")
-                                .font(.headline)
-                            Text("10分")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                // 休憩時間設定
+                HStack {
+                    Image(systemName: "cup.and.saucer")
+                        .foregroundColor(.green)
+                        .font(.title3)
+                    Text("休憩時間")
+                        .font(.headline)
+                    Spacer()
+                    Stepper(
+                        "\(pomodoroManager.restDurationMinutes)分",
+                        value: $pomodoroManager.restDurationMinutes,
+                        in: 1...60
+                    )
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
@@ -53,6 +60,7 @@ struct GeneralSettingsTab: View {
                 )
 
                 Divider()
+                    .padding(.vertical, 8)
 
                 // 統計情報
                 VStack(alignment: .leading, spacing: 12) {
@@ -77,6 +85,7 @@ struct GeneralSettingsTab: View {
                 )
 
                 Divider()
+                    .padding(.vertical, 8)
 
                 // リセットボタン
                 Button(action: {
@@ -86,12 +95,8 @@ struct GeneralSettingsTab: View {
                         Image(systemName: "arrow.counterclockwise")
                         Text("タイマーをリセット")
                     }
-                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-
-                Spacer()
-                    .frame(height: 20)
 
                 // アプリ終了ボタン
                 Button(action: {
@@ -101,13 +106,12 @@ struct GeneralSettingsTab: View {
                         Image(systemName: "power")
                         Text("アプリを終了")
                     }
-                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
             }
             .padding(30)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: 450)
         }
         .frame(minWidth: 500, minHeight: 400)
     }
