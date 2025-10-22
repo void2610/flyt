@@ -24,10 +24,14 @@ class HotCornerManager: ObservableObject {
     // ホットエッジの設定
     @Published var selectedCorner: HotCorner = .disabled
     @Published var isEnabled: Bool = false
+    @Published var edgeThreshold: CGFloat = 3.0  // ホットエッジの判定幅（ピクセル）
+    @Published var triggerDelay: TimeInterval = 0.3  // トリガーまでの遅延時間（秒）
 
     // UserDefaultsのキー
     private let selectedCornerKey = "HotCornerSelectedCorner"
     private let isEnabledKey = "HotCornerIsEnabled"
+    private let edgeThresholdKey = "HotCornerEdgeThreshold"
+    private let triggerDelayKey = "HotCornerTriggerDelay"
 
     // マウスイベントモニター（グローバルとローカル）
     private var globalMouseMonitor: Any?
@@ -38,12 +42,6 @@ class HotCornerManager: ObservableObject {
 
     // 最後にトリガーされた時刻（クールダウン用）
     private var lastTriggered: Date?
-
-    // ホットエッジの判定幅（ピクセル）
-    private let edgeThreshold: CGFloat = 3
-
-    // トリガーまでの遅延時間（秒）
-    private let triggerDelay: TimeInterval = 0.3
 
     // クールダウン時間（秒）
     private let cooldownDuration: TimeInterval = 0.5
@@ -59,6 +57,8 @@ class HotCornerManager: ObservableObject {
     func saveSettings() {
         UserDefaults.standard.set(selectedCorner.rawValue, forKey: selectedCornerKey)
         UserDefaults.standard.set(isEnabled, forKey: isEnabledKey)
+        UserDefaults.standard.set(Double(edgeThreshold), forKey: edgeThresholdKey)
+        UserDefaults.standard.set(triggerDelay, forKey: triggerDelayKey)
     }
 
     // 設定を読み込み
@@ -68,6 +68,18 @@ class HotCornerManager: ObservableObject {
             selectedCorner = corner
         }
         isEnabled = UserDefaults.standard.bool(forKey: isEnabledKey)
+
+        // エッジ判定幅の読み込み（デフォルト: 3.0）
+        let savedThreshold = UserDefaults.standard.double(forKey: edgeThresholdKey)
+        if savedThreshold > 0 {
+            edgeThreshold = CGFloat(savedThreshold)
+        }
+
+        // トリガー遅延時間の読み込み（デフォルト: 0.3）
+        let savedDelay = UserDefaults.standard.double(forKey: triggerDelayKey)
+        if savedDelay > 0 {
+            triggerDelay = savedDelay
+        }
     }
 
     // マウス監視を開始
@@ -176,5 +188,17 @@ class HotCornerManager: ObservableObject {
         } else {
             stopMonitoring()
         }
+    }
+
+    // エッジ判定幅を更新
+    func updateEdgeThreshold(_ threshold: CGFloat) {
+        edgeThreshold = threshold
+        saveSettings()
+    }
+
+    // トリガー遅延時間を更新
+    func updateTriggerDelay(_ delay: TimeInterval) {
+        triggerDelay = delay
+        saveSettings()
     }
 }

@@ -45,6 +45,61 @@ struct HotCornerSettingsView: View {
                         .frame(height: 120)
                         .padding(.top, 8)
                 }
+
+                Divider()
+                    .padding(.vertical, 4)
+
+                // エッジ判定幅の設定
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("判定幅:")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(Int(manager.edgeThreshold)) px")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack {
+                        Text("狭い")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Slider(value: Binding(
+                            get: { Double(manager.edgeThreshold) },
+                            set: { manager.updateEdgeThreshold(CGFloat($0)) }
+                        ), in: 1...10, step: 1)
+                        Text("広い")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                // トリガー遅延時間の設定
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("反応速度:")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(String(format: "%.1f 秒", manager.triggerDelay))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack {
+                        Text("速い")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Slider(value: Binding(
+                            get: { manager.triggerDelay },
+                            set: { manager.updateTriggerDelay($0) }
+                        ), in: 0.1...1.0, step: 0.1)
+                        Text("遅い")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
         }
     }
