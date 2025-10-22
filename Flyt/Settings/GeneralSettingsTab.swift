@@ -102,8 +102,18 @@ struct GeneralSettingsTab: View {
 
                 // 統計情報
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("今日の統計")
-                        .font(.headline)
+                    HStack {
+                        Text("今日の統計")
+                            .font(.headline)
+                        Spacer()
+                        Button(action: {
+                            pomodoroManager.resetSessionCount()
+                        }) {
+                            Text("リセット")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.borderless)
+                    }
 
                     HStack {
                         Image(systemName: "checkmark.circle.fill")

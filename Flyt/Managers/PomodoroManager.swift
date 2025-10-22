@@ -45,6 +45,9 @@ class PomodoroManager: ObservableObject {
     // タイマー
     private var timer: Timer?
 
+    // 日付リセット用タイマー
+    private var midnightTimer: Timer?
+
     private init() {
         // UserDefaultsから設定を読み込み
         let savedWork = UserDefaults.standard.integer(forKey: "workDurationMinutes")
@@ -59,6 +62,62 @@ class PomodoroManager: ObservableObject {
 
         // 初期化時は作業時間を設定
         remainingSeconds = workDurationMinutes * 60
+
+        // 前回のセッション数をチェックして、日付が変わっていたらリセット
+        checkAndResetSessionCount()
+
+        // 毎日0時にセッション数をリセットするタイマーを設定
+        scheduleMidnightReset()
+    }
+
+    // セッション数をチェックして、日付が変わっていたらリセット
+    private func checkAndResetSessionCount() {
+        let lastResetDate = UserDefaults.standard.string(forKey: "lastResetDate")
+        let todayString = getTodayString()
+
+        if lastResetDate != todayString {
+            // 日付が変わっている場合はリセット
+            sessionCount = 0
+            UserDefaults.standard.set(todayString, forKey: "lastResetDate")
+        } else {
+            // 同じ日の場合は保存されたセッション数を復元
+            let savedCount = UserDefaults.standard.integer(forKey: "sessionCount")
+            sessionCount = savedCount
+        }
+    }
+
+    // 今日の日付文字列を取得
+    private func getTodayString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
+
+    // 0時にリセットするタイマーを設定
+    private func scheduleMidnightReset() {
+        let calendar = Calendar.current
+        let now = Date()
+
+        // 次の0時を計算
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+           let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: tomorrow) {
+
+            let timeInterval = nextMidnight.timeIntervalSince(now)
+
+            // 次の0時にセッション数をリセット
+            midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+                self?.resetSessionCount()
+                // 次の日のタイマーを設定
+                self?.scheduleMidnightReset()
+            }
+        }
+    }
+
+    // セッション数のみをリセット
+    func resetSessionCount() {
+        sessionCount = 0
+        UserDefaults.standard.set(getTodayString(), forKey: "lastResetDate")
+        UserDefaults.standard.set(0, forKey: "sessionCount")
     }
 
     // タイマーを開始
@@ -91,7 +150,6 @@ class PomodoroManager: ObservableObject {
         pause()
         state = .idle
         remainingSeconds = workDurationMinutes * 60
-        sessionCount = 0
     }
 
     // 次のセッションにスキップ
@@ -121,6 +179,8 @@ class PomodoroManager: ObservableObject {
         case .working:
             // 作業完了 → 休憩へ（一時停止状態）
             sessionCount += 1
+            // セッション数を保存
+            UserDefaults.standard.set(sessionCount, forKey: "sessionCount")
             state = .resting
             remainingSeconds = restDurationMinutes * 60
 
