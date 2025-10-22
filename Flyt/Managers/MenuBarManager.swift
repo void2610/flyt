@@ -58,16 +58,16 @@ class MenuBarManager {
         // 現在のホットキーを取得
         let hotKeyString = HotKeyManager.shared.getHotKeyString()
 
-        // メモを表示/非表示
+        // タイマーを表示/非表示
         let toggleItem = NSMenuItem(
-            title: "メモを表示/非表示",
+            title: "タイマーを表示/非表示",
             action: #selector(toggleNoteWindow),
             keyEquivalent: ""
         )
         toggleItem.target = self
 
         // ホットキーの表示を右側に追加
-        let attributedTitle = NSMutableAttributedString(string: "メモを表示/非表示")
+        let attributedTitle = NSMutableAttributedString(string: "タイマーを表示/非表示")
         let spacing = NSMutableAttributedString(string: "\t")
         let hotKey = NSMutableAttributedString(
             string: hotKeyString,
@@ -105,7 +105,7 @@ class MenuBarManager {
         statusItem?.menu = menu
     }
 
-    // メモウィンドウを表示/非表示
+    // タイマーウィンドウを表示/非表示
     @objc private func toggleNoteWindow() {
         WindowManager.shared.toggleWindow()
     }

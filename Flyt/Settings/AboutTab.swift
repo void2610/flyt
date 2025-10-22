@@ -45,7 +45,7 @@ struct AboutTab: View {
                     .padding(.vertical, 8)
 
                 // 説明
-                Text("フルスクリーンアプリの上にも表示できるmacOS用メモアプリ")
+                Text("フルスクリーンアプリの上にも表示できるmacOS用ポモドーロタイマー")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

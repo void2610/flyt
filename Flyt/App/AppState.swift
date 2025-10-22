@@ -9,7 +9,7 @@ import SwiftUI
 
 // アプリケーション全体の状態を管理
 class AppState: ObservableObject {
-    // メモウィンドウの表示状態
+    // タイマーウィンドウの表示状態
     @Published var isNoteWindowVisible = false
 
     // シングルトンインスタンス

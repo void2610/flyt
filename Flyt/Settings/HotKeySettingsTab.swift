@@ -15,7 +15,7 @@ struct HotKeySettingsTab: View {
                     .font(.title2)
                     .fontWeight(.semibold)
 
-                Text("メモウィンドウを開閉するキーボードショートカットを設定します")
+                Text("タイマーウィンドウを開閉するキーボードショートカットを設定します")
                     .font(.caption)
                     .foregroundColor(.secondary)
 

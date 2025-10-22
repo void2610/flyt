@@ -15,7 +15,7 @@ struct HotEdgeSettingsTab: View {
                     .font(.title2)
                     .fontWeight(.semibold)
 
-                Text("画面の端にマウスを移動してメモウィンドウを開閉します")
+                Text("画面の端にマウスを移動してタイマーウィンドウを開閉します")
                     .font(.caption)
                     .foregroundColor(.secondary)
 

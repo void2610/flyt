@@ -7,13 +7,10 @@
 
 import AppKit
 import SwiftUI
-import SwiftData
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var localEventMonitor: Any?
     private var globalEventMonitor: Any?
-
-    var modelContext: ModelContext?
 
     // 権限チェック用タイマー
     private var permissionCheckTimer: Timer?
@@ -62,7 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // 設定されたホットキーと一致した場合にメモウィンドウをトグル
+    // 設定されたホットキーと一致した場合にタイマーウィンドウをトグル
     private func handleKeyEvent(_ event: NSEvent, isLocal: Bool) -> NSEvent? {
         if HotKeyManager.shared.matches(event: event) {
             DispatchQueue.main.async {
@@ -120,15 +117,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         HotCornerManager.shared.startMonitoring()
     }
 
-    // メモウィンドウを開く/閉じる
+    // タイマーウィンドウを開く/閉じる
     private func toggleNoteWindow() {
         WindowManager.shared.toggleWindow()
     }
 
     // WindowManagerでウィンドウを初期化
-    func initializeWindow(modelContext: ModelContext) {
-        self.modelContext = modelContext
-        WindowManager.shared.createNoteWindow(modelContext: modelContext)
+    func initializeWindow() {
+        WindowManager.shared.createNoteWindow()
     }
 
     // 権限の監視を停止

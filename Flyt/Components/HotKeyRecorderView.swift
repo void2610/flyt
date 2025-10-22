@@ -15,7 +15,7 @@ struct HotKeyRecorderView: View {
 
     var body: some View {
         HStack {
-            Text("メモを表示/非表示:")
+            Text("タイマーを表示/非表示:")
 
             Spacer()
 

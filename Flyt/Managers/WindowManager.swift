@@ -7,13 +7,12 @@
 
 import AppKit
 import SwiftUI
-import SwiftData
 
 class WindowManager {
     // シングルトンインスタンス
     static let shared = WindowManager()
 
-    // メモウィンドウ
+    // タイマーウィンドウ
     private var noteWindow: NSWindow?
 
     // 設定ウィンドウ
@@ -21,10 +20,10 @@ class WindowManager {
 
     private init() {}
 
-    // メモウィンドウを作成
-    func createNoteWindow(modelContext: ModelContext) {
+    // タイマーウィンドウを作成
+    func createNoteWindow() {
         // ウィンドウのサイズと位置
-        let windowRect = NSRect(x: 0, y: 0, width: 800, height: 600)
+        let windowRect = NSRect(x: 0, y: 0, width: 600, height: 500)
 
         // NSWindowを手動で作成
         let window = NSWindow(
@@ -58,12 +57,8 @@ class WindowManager {
 
         // SwiftUIビューをNSHostingViewでラップ
         let contentView = ContentView()
-            .environment(\.modelContext, modelContext)
 
         let hostingView = NSHostingView(rootView: contentView)
-
-        // SwiftUIのツールバーを有効化
-        hostingView.sceneBridgingOptions = [.toolbars]
 
         window.contentView = hostingView
 
