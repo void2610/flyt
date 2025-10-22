@@ -40,19 +40,16 @@ struct SettingsView: View {
                         VStack(spacing: 4) {
                             Image(systemName: tab.icon)
                                 .font(.system(size: 18))
+                                .foregroundColor(selectedTab == tab ? .accentColor : .secondary)
                             Text(tab.rawValue)
                                 .font(.system(size: 9))
+                                .foregroundColor(.primary)
                         }
                         .frame(width: 70, height: 50)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(selectedTab == tab ? Color.accentColor.opacity(0.15) : Color(NSColor.windowBackgroundColor).opacity(0.5))
+                                .fill(selectedTab == tab ? Color.white.opacity(0.1) : Color(NSColor.windowBackgroundColor).opacity(0.5))
                         )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(selectedTab == tab ? Color.accentColor : Color.clear, lineWidth: 2)
-                        )
-                        .foregroundColor(selectedTab == tab ? .accentColor : .primary)
                     }
                     .buttonStyle(.plain)
                 }
