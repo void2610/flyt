@@ -105,14 +105,6 @@ struct GeneralSettingsTab: View {
                     HStack {
                         Text("今日の統計")
                             .font(.headline)
-                        Spacer()
-                        Button(action: {
-                            pomodoroManager.resetSessionCount()
-                        }) {
-                            Text("リセット")
-                                .font(.caption)
-                        }
-                        .buttonStyle(.borderless)
                     }
 
                     HStack {
@@ -135,28 +127,32 @@ struct GeneralSettingsTab: View {
                 Divider()
                     .padding(.vertical, 8)
 
-                // リセットボタン
-                Button(action: {
-                    pomodoroManager.reset()
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.counterclockwise")
-                        Text("タイマーをリセット")
+                HStack(spacing: 20) {
+                    // リセットボタン
+                    Button(action: {
+                        pomodoroManager.reset()
+                        pomodoroManager.resetSessionCount()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                            Text("タイマーをリセット")
+                        }
                     }
-                }
-                .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.white)
 
-                // アプリ終了ボタン
-                Button(action: {
-                    NSApplication.shared.terminate(nil)
-                }) {
-                    HStack {
-                        Image(systemName: "power")
-                        Text("アプリを終了")
+                    // アプリ終了ボタン
+                    Button(action: {
+                        NSApplication.shared.terminate(nil)
+                    }) {
+                        HStack {
+                            Image(systemName: "power")
+                            Text("アプリを終了")
+                        }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
             }
             .padding(30)
             .frame(maxWidth: 450)
