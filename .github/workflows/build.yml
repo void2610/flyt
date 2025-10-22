@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build app
+        run: |
+          xcodebuild -project Flyt.xcodeproj \
+            -scheme Flyt \
+            -configuration Release \
+            -derivedDataPath ./build \
+            build
+
+      - name: Verify build
+        run: |
+          APP_PATH="./build/Build/Products/Release/Flyt.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Error: App not found at $APP_PATH"
+            exit 1
+          fi
+          echo "Build successful: Flyt.app created"

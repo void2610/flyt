@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build app
+        run: |
+          xcodebuild -project Flyt.xcodeproj \
+            -scheme Flyt \
+            -configuration Release \
+            -derivedDataPath ./build \
+            build
+
+      - name: Create app bundle
+        run: |
+          # ビルド成果物のパス
+          APP_PATH="./build/Build/Products/Release/Flyt.app"
+
+          # アプリが存在するか確認
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Error: App not found at $APP_PATH"
+            exit 1
+          fi
+
+          # ZIPファイルを作成
+          cd ./build/Build/Products/Release
+          zip -r Flyt.zip Flyt.app
+          mv Flyt.zip ../../../../
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: Flyt.zip
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Flyt ${{ steps.get_version.outputs.VERSION }}
+
+            ### インストール方法
+            1. `Flyt.zip` をダウンロード
+            2. ZIPファイルを解凍
+            3. `Flyt.app` を `/Applications` フォルダに移動
+            4. アプリを起動し、アクセシビリティ権限を許可
+
+            ### 機能
+            - ポモドーロタイマー（作業時間と休憩時間をカスタマイズ可能）
+            - フルスクリーンアプリの上に表示可能なフローティングウィンドウ
+            - グローバルホットキー（デフォルト: Control+I）
+            - ホットエッジ（画面の端にマウスを移動して起動）
+            - セッション数カウント（毎日0時に自動リセット）
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
