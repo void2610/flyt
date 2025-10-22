@@ -29,14 +29,20 @@ struct PomodoroTimerView: View {
                 .foregroundColor(stateColor)
                 .padding(.bottom, 12)
 
-            // セッション数
+            // セッション数と合計時間
             if manager.sessionCount > 0 {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                    Text("完了: \(manager.sessionCount)セッション")
-                        .font(.caption)
+                VStack(spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                        Text("完了: \(manager.sessionCount)セッション")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Text("合計: \(totalTimeString)")
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
                 .padding(.bottom, 20)
@@ -147,6 +153,19 @@ struct PomodoroTimerView: View {
             return .red
         case .resting:
             return .green
+        }
+    }
+
+    // 合計時間の文字列（作業時間 × セッション数）
+    private var totalTimeString: String {
+        let totalMinutes = manager.workDurationMinutes * manager.sessionCount
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+
+        if hours > 0 {
+            return "\(hours)時間\(minutes)分"
+        } else {
+            return "\(minutes)分"
         }
     }
 }
