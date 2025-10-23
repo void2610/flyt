@@ -1,23 +1,35 @@
 #!/bin/bash
 
 # Flytをビルドして/Applicationsにインストールするスクリプト
+# 使い方:
+#   ./build-and-install.sh         # リリースビルド（デフォルト）
+#   ./build-and-install.sh debug   # デバッグビルド
 
 set -e
+
+# ビルド構成を決定（引数でdebugを指定するとデバッグビルド）
+if [ "$1" == "debug" ]; then
+  CONFIGURATION="Debug"
+  echo "🔧 デバッグビルドモード"
+else
+  CONFIGURATION="Release"
+  echo "🚀 リリースビルドモード"
+fi
 
 # 既存のFlytアプリを終了
 echo "🛑 既存のFlytアプリを終了中..."
 pkill -x Flyt || true
 
-echo "🔨 リリースビルドを開始..."
+echo "🔨 ${CONFIGURATION}ビルドを開始..."
 xcodebuild -project Flyt.xcodeproj \
   -scheme Flyt \
-  -configuration Release \
+  -configuration ${CONFIGURATION} \
   build \
   -quiet
 
 echo "📦 /Applicationsにコピー中..."
 rm -rf /Applications/Flyt.app
-cp -R ~/Library/Developer/Xcode/DerivedData/Flyt-*/Build/Products/Release/Flyt.app /Applications/
+cp -R ~/Library/Developer/Xcode/DerivedData/Flyt-*/Build/Products/${CONFIGURATION}/Flyt.app /Applications/
 
 echo "🔄 アクセシビリティ設定をリセット..."
 tccutil reset Accessibility void2610.Flyt
