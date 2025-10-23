@@ -126,6 +126,8 @@ class PomodoroManager: ObservableObject {
         sessionCount = 0
         UserDefaults.standard.set(getTodayString(), forKey: "lastResetDate")
         UserDefaults.standard.set(0, forKey: "sessionCount")
+        // 同期関連のタイムスタンプもクリア
+        UserDefaults.standard.removeObject(forKey: "lastUpdated")
     }
 
     // タイマーを開始
