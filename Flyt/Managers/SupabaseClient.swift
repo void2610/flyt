@@ -7,6 +7,7 @@
 
 import Foundation
 import Supabase
+import Auth
 
 class SupabaseClientWrapper {
     // シングルトンインスタンス
@@ -40,9 +41,32 @@ class SupabaseClientWrapper {
             return
         }
 
+        // キーチェーンではなくUserDefaultsを使用するように設定
         self._client = Supabase.SupabaseClient(
             supabaseURL: url,
-            supabaseKey: supabaseAnonKey
+            supabaseKey: supabaseAnonKey,
+            options: .init(
+                auth: .init(
+                    storage: UserDefaultsSessionStorage()
+                )
+            )
         )
+    }
+}
+
+// UserDefaultsを使用したセッションストレージ
+class UserDefaultsSessionStorage: AuthLocalStorage {
+    private let key = "supabase.auth.session"
+
+    func store(key: String, value: Data) throws {
+        UserDefaults.standard.set(value, forKey: key)
+    }
+
+    func retrieve(key: String) throws -> Data? {
+        return UserDefaults.standard.data(forKey: key)
+    }
+
+    func remove(key: String) throws {
+        UserDefaults.standard.removeObject(forKey: key)
     }
 }
