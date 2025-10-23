@@ -29,6 +29,17 @@ struct FlytApp: App {
                         window.setIsVisible(false)
                     }
 
+                    // ユーザーが過去にログインしたことがある場合、認証状態を確認して同期を開始
+                    let hasUserLoggedIn = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasUserLoggedIn)
+                    if hasUserLoggedIn {
+                        Task {
+                            await AuthManager.shared.checkAuthStatus()
+                            AuthManager.shared.startAuthStateListener()
+                            if AuthManager.shared.isAuthenticated {
+                                await SyncManager.shared.syncFromCloud()
+                            }
+                        }
+                    }
                 }
         }
         .windowStyle(.hiddenTitleBar)
