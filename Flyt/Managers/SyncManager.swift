@@ -55,11 +55,11 @@ class SyncManager: ObservableObject {
 
     private init() {
         // デバイスIDを生成または取得
-        if let savedDeviceId = UserDefaults.standard.string(forKey: "deviceId") {
+        if let savedDeviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceId) {
             self.deviceId = savedDeviceId
         } else {
             self.deviceId = UUID().uuidString
-            UserDefaults.standard.set(self.deviceId, forKey: "deviceId")
+            UserDefaults.standard.set(self.deviceId, forKey: UserDefaultsKeys.deviceId)
         }
     }
 
@@ -114,7 +114,7 @@ class SyncManager: ObservableObject {
             if let sessionData = response.first {
                 // サーバーのデータを常に適用（Server as Source of Truth）
                 onSessionCountUpdated?(sessionData.sessionCount)
-                UserDefaults.standard.set(sessionData.lastUpdated, forKey: "lastUpdated")
+                UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
                 lastSyncMessage = "✅ クラウドから取得 (count=\(sessionData.sessionCount))"
             } else {
                 lastSyncMessage = "ℹ️ クラウドにデータがありません"
@@ -200,7 +200,7 @@ class SyncManager: ObservableObject {
                     .execute()
             }
 
-            UserDefaults.standard.set(now, forKey: "lastUpdated")
+            UserDefaults.standard.set(now, forKey: UserDefaultsKeys.lastUpdated)
             lastSyncDate = Date()
             syncError = nil
 

@@ -125,7 +125,7 @@ class AuthManager: ObservableObject {
         self.userId = nil
 
         // 同期関連のUserDefaultsをクリア
-        UserDefaults.standard.removeObject(forKey: "lastUpdated")
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.lastUpdated)
     }
 
     // クリーンアップ
