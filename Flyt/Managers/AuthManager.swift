@@ -34,11 +34,6 @@ class AuthManager: ObservableObject {
             return
         }
 
-        // 保存された認証セッションを復元
-        Task {
-            await checkAuthStatus()
-            startAuthStateListener()
-        }
     }
 
     // 認証状態を確認
@@ -62,7 +57,7 @@ class AuthManager: ObservableObject {
     }
 
     // 認証状態の変更を監視
-    private func startAuthStateListener() {
+    func startAuthStateListener() {
         guard let supabase = supabase else { return }
 
         authStateTask = Task {
@@ -110,6 +105,14 @@ class AuthManager: ObservableObject {
 
         // 認証完了後、セッション情報を更新
         await checkAuthStatus()
+
+        // ユーザーがログインしたことを記録
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.hasUserLoggedIn)
+
+        // 認証状態監視を開始（初回ログイン時のみ）
+        if authStateTask == nil {
+            startAuthStateListener()
+        }
     }
 
     // サインアウト
@@ -126,6 +129,7 @@ class AuthManager: ObservableObject {
 
         // 同期関連のUserDefaultsをクリア
         UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.lastUpdated)
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.hasUserLoggedIn)
     }
 
     // クリーンアップ

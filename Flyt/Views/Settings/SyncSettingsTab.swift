@@ -13,6 +13,7 @@ struct SyncSettingsTab: View {
 
     @State private var isSigningIn = false
     @State private var errorMessage: String?
+    @State private var hasCheckedAuth = false
 
     var body: some View {
         ScrollView {
@@ -39,6 +40,22 @@ struct SyncSettingsTab: View {
             .frame(maxWidth: 450)
         }
         .frame(minWidth: 500, minHeight: 400)
+        .onAppear {
+            // 設定画面を開いたときに一度だけ認証状態を確認
+            if !hasCheckedAuth {
+                hasCheckedAuth = true
+                let hasUserLoggedIn = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasUserLoggedIn)
+                if hasUserLoggedIn {
+                    Task {
+                        await authManager.checkAuthStatus()
+                        authManager.startAuthStateListener()
+                        if authManager.isAuthenticated {
+                            syncManager.startSync()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // ログイン済みビュー

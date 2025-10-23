@@ -21,6 +21,9 @@ struct UserDefaultsKeys {
     // デバイス情報
     static let deviceId = "deviceId"
 
+    // 認証フラグ（ユーザーが明示的にログインしたかどうか）
+    static let hasUserLoggedIn = "hasUserLoggedIn"
+
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}
 }
