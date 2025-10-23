@@ -36,6 +36,7 @@ class SyncManager: ObservableObject {
     @Published var isSyncing: Bool = false
     @Published var lastSyncDate: Date?
     @Published var syncError: String?
+    @Published var lastSyncMessage: String = ""
 
     // Supabaseクライアント
     private var supabase: Supabase.SupabaseClient? {
@@ -132,18 +133,32 @@ class SyncManager: ObservableObject {
 
     // ローカルのデータをクラウドに保存
     func syncToCloud(sessionCount: Int) {
-        guard SupabaseClientWrapper.shared.isConfigured else { return }
+        guard SupabaseClientWrapper.shared.isConfigured else {
+            Task { @MainActor in
+                self.lastSyncMessage = "⚠️ Supabaseが設定されていません"
+            }
+            return
+        }
         guard let userIdString = AuthManager.shared.userId,
-              let userId = UUID(uuidString: userIdString) else { return }
+              let userId = UUID(uuidString: userIdString) else {
+            Task { @MainActor in
+                self.lastSyncMessage = "⚠️ ログインしていません"
+            }
+            return
+        }
 
-        Task {
+        Task { @MainActor in
+            self.lastSyncMessage = "📤 アップロード中... (count=\(sessionCount))"
             await performSyncToCloud(userId: userId, sessionCount: sessionCount)
         }
     }
 
     @MainActor
     private func performSyncToCloud(userId: UUID, sessionCount: Int) async {
-        guard let supabase = supabase else { return }
+        guard let supabase = supabase else {
+            lastSyncMessage = "⚠️ Supabaseクライアントが取得できません"
+            return
+        }
 
         isSyncing = true
         defer { isSyncing = false }
@@ -161,19 +176,41 @@ class SyncManager: ObservableObject {
                 deviceId: deviceId
             )
 
-            // UPSERTでデータを保存（存在すれば更新、なければ挿入）
-            try await supabase
+            lastSyncMessage = "📝 送信中... (date=\(today), count=\(sessionCount))"
+
+            // まず既存のデータを確認
+            let existing: [SessionData] = try await supabase
                 .from("sessions")
-                .upsert(sessionData)
+                .select()
+                .eq("user_id", value: userId.uuidString)
+                .eq("session_date", value: today)
                 .execute()
+                .value
+
+            if let existingData = existing.first {
+                // 既存データがある場合は更新
+                try await supabase
+                    .from("sessions")
+                    .update(sessionData)
+                    .eq("id", value: existingData.id?.uuidString ?? "")
+                    .execute()
+            } else {
+                // 新規挿入
+                try await supabase
+                    .from("sessions")
+                    .insert(sessionData)
+                    .execute()
+            }
 
             UserDefaults.standard.set(now, forKey: "lastUpdated")
             lastSyncDate = Date()
             syncError = nil
 
+            lastSyncMessage = "✅ アップロード成功 (count=\(sessionCount))"
+
         } catch {
-            print("同期エラー: \(error)")
             syncError = error.localizedDescription
+            lastSyncMessage = "❌ エラー: \(error.localizedDescription)"
         }
     }
 

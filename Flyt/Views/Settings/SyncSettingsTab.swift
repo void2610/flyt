@@ -194,6 +194,25 @@ struct SyncSettingsTab: View {
                 }
             }
 
+            // 同期メッセージ
+            if !syncManager.lastSyncMessage.isEmpty {
+                HStack {
+                    if syncManager.lastSyncMessage.contains("✅") {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    } else if syncManager.lastSyncMessage.contains("⚠️") || syncManager.lastSyncMessage.contains("❌") {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                    } else {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.blue)
+                    }
+                    Text(syncManager.lastSyncMessage)
+                        .font(.caption)
+                        .lineLimit(3)
+                }
+            }
+
             // 同期エラー
             if let syncError = syncManager.syncError {
                 HStack {
