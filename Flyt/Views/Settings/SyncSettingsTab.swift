@@ -209,18 +209,32 @@ struct SyncSettingsTab: View {
 
             // 手動同期ボタン
             if authManager.isAuthenticated {
-                Button(action: {
-                    Task {
-                        await syncManager.syncFromCloud()
+                HStack(spacing: 12) {
+                    Button(action: {
+                        Task {
+                            await syncManager.syncFromCloud()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                            Text("クラウドから取得")
+                        }
                     }
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                        Text("今すぐ同期")
+                    .buttonStyle(.bordered)
+                    .disabled(syncManager.isSyncing)
+
+                    Button(action: {
+                        let sessionCount = PomodoroManager.shared.sessionCount
+                        syncManager.syncToCloud(sessionCount: sessionCount)
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.up.circle")
+                            Text("アップロード")
+                        }
                     }
+                    .buttonStyle(.bordered)
+                    .disabled(syncManager.isSyncing)
                 }
-                .buttonStyle(.bordered)
-                .disabled(syncManager.isSyncing)
             }
         }
         .padding(.vertical, 12)
