@@ -68,6 +68,14 @@ class PomodoroManager: ObservableObject {
 
         // 毎日0時にセッション数をリセットするタイマーを設定
         scheduleMidnightReset()
+
+        // SyncManagerからのセッション数更新を受け取る
+        SyncManager.shared.onSessionCountUpdated = { [weak self] newCount in
+            DispatchQueue.main.async {
+                self?.sessionCount = newCount
+                UserDefaults.standard.set(newCount, forKey: "sessionCount")
+            }
+        }
     }
 
     // セッション数をチェックして、日付が変わっていたらリセット
@@ -181,6 +189,10 @@ class PomodoroManager: ObservableObject {
             sessionCount += 1
             // セッション数を保存
             UserDefaults.standard.set(sessionCount, forKey: "sessionCount")
+
+            // クラウドに同期
+            SyncManager.shared.syncToCloud(sessionCount: sessionCount)
+
             state = .resting
             remainingSeconds = restDurationMinutes * 60
 
