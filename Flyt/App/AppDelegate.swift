@@ -78,8 +78,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let accessEnabled = AXIsProcessTrustedWithOptions(options)
 
         if !accessEnabled {
-            // TODO: 製品ビルドではアラートを表示する
-            // showAccessibilityPermissionAlert()
+            #if !DEBUG
+            // リリースビルドではアラートを表示
+            showAccessibilityPermissionAlert()
+            #endif
         }
 
         return accessEnabled

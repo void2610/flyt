@@ -28,7 +28,12 @@ struct AboutTab: View {
                         Text("Version:")
                             .foregroundColor(.secondary)
                         Spacer()
+                        #if DEBUG
+                        Text("0.1.0 (Debug)")
+                            .foregroundColor(.orange)
+                        #else
                         Text("0.1.0")
+                        #endif
                     }
 
                     HStack {

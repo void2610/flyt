@@ -29,7 +29,7 @@ class PomodoroManager: ObservableObject {
     // タイマー設定（分単位）
     @Published var workDurationMinutes: Int = 30 {
         didSet {
-            UserDefaults.standard.set(workDurationMinutes, forKey: "workDurationMinutes")
+            UserDefaults.standard.set(workDurationMinutes, forKey: UserDefaultsKeys.workDurationMinutes)
             // 待機中の場合は時間を更新
             if state == .idle {
                 remainingSeconds = workDurationMinutes * 60
@@ -38,7 +38,7 @@ class PomodoroManager: ObservableObject {
     }
     @Published var restDurationMinutes: Int = 10 {
         didSet {
-            UserDefaults.standard.set(restDurationMinutes, forKey: "restDurationMinutes")
+            UserDefaults.standard.set(restDurationMinutes, forKey: UserDefaultsKeys.restDurationMinutes)
         }
     }
 
@@ -50,8 +50,8 @@ class PomodoroManager: ObservableObject {
 
     private init() {
         // UserDefaultsから設定を読み込み
-        let savedWork = UserDefaults.standard.integer(forKey: "workDurationMinutes")
-        let savedRest = UserDefaults.standard.integer(forKey: "restDurationMinutes")
+        let savedWork = UserDefaults.standard.integer(forKey: UserDefaultsKeys.workDurationMinutes)
+        let savedRest = UserDefaults.standard.integer(forKey: UserDefaultsKeys.restDurationMinutes)
 
         if savedWork > 0 {
             workDurationMinutes = savedWork
@@ -68,20 +68,28 @@ class PomodoroManager: ObservableObject {
 
         // 毎日0時にセッション数をリセットするタイマーを設定
         scheduleMidnightReset()
+
+        // SyncManagerからのセッション数更新を受け取る
+        SyncManager.shared.onSessionCountUpdated = { [weak self] newCount in
+            DispatchQueue.main.async {
+                self?.sessionCount = newCount
+                UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.sessionCount)
+            }
+        }
     }
 
     // セッション数をチェックして、日付が変わっていたらリセット
     private func checkAndResetSessionCount() {
-        let lastResetDate = UserDefaults.standard.string(forKey: "lastResetDate")
+        let lastResetDate = UserDefaults.standard.string(forKey: UserDefaultsKeys.lastResetDate)
         let todayString = getTodayString()
 
         if lastResetDate != todayString {
             // 日付が変わっている場合はリセット
             sessionCount = 0
-            UserDefaults.standard.set(todayString, forKey: "lastResetDate")
+            UserDefaults.standard.set(todayString, forKey: UserDefaultsKeys.lastResetDate)
         } else {
             // 同じ日の場合は保存されたセッション数を復元
-            let savedCount = UserDefaults.standard.integer(forKey: "sessionCount")
+            let savedCount = UserDefaults.standard.integer(forKey: UserDefaultsKeys.sessionCount)
             sessionCount = savedCount
         }
     }
@@ -116,8 +124,10 @@ class PomodoroManager: ObservableObject {
     // セッション数のみをリセット
     func resetSessionCount() {
         sessionCount = 0
-        UserDefaults.standard.set(getTodayString(), forKey: "lastResetDate")
-        UserDefaults.standard.set(0, forKey: "sessionCount")
+        UserDefaults.standard.set(getTodayString(), forKey: UserDefaultsKeys.lastResetDate)
+        UserDefaults.standard.set(0, forKey: UserDefaultsKeys.sessionCount)
+        // 同期関連のタイムスタンプもクリア
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.lastUpdated)
     }
 
     // タイマーを開始
@@ -180,7 +190,11 @@ class PomodoroManager: ObservableObject {
             // 作業完了 → 休憩へ（一時停止状態）
             sessionCount += 1
             // セッション数を保存
-            UserDefaults.standard.set(sessionCount, forKey: "sessionCount")
+            UserDefaults.standard.set(sessionCount, forKey: UserDefaultsKeys.sessionCount)
+
+            // クラウドに同期
+            SyncManager.shared.syncToCloud(sessionCount: sessionCount)
+
             state = .resting
             remainingSeconds = restDurationMinutes * 60
 

@@ -12,6 +12,7 @@ enum SettingsTab: String, CaseIterable {
     case general = "一般"
     case hotkey = "ホットキー"
     case hotedge = "ホットエッジ"
+    case sync = "同期"
     case accessibility = "アクセシビリティ"
     case about = "情報"
 
@@ -20,6 +21,7 @@ enum SettingsTab: String, CaseIterable {
         case .general: return "gearshape"
         case .hotkey: return "keyboard"
         case .hotedge: return "hand.point.up"
+        case .sync: return "cloud"
         case .accessibility: return "accessibility"
         case .about: return "info.circle"
         }
@@ -70,6 +72,8 @@ struct SettingsView: View {
                     HotKeySettingsTab()
                 case .hotedge:
                     HotEdgeSettingsTab()
+                case .sync:
+                    SyncSettingsTab()
                 case .accessibility:
                     AccessibilitySettingsTab()
                 case .about:
