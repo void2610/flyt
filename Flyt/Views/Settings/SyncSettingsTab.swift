@@ -41,7 +41,6 @@ struct SyncSettingsTab: View {
         }
         .frame(minWidth: 500, minHeight: 400)
         .onAppear {
-            // 設定画面を開いたときに一度だけ認証状態を確認
             if !hasCheckedAuth {
                 hasCheckedAuth = true
                 let hasUserLoggedIn = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasUserLoggedIn)
@@ -49,9 +48,6 @@ struct SyncSettingsTab: View {
                     Task {
                         await authManager.checkAuthStatus()
                         authManager.startAuthStateListener()
-                        if authManager.isAuthenticated {
-                            syncManager.startSync()
-                        }
                     }
                 }
             }
