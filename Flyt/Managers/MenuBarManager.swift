@@ -31,12 +31,25 @@ class MenuBarManager {
                 self?.updateMenu()
             }
             .store(in: &cancellables)
+
+        // PomodoroManagerの変更を監視してアイコンを更新
+        PomodoroManager.shared.$remainingSeconds
+            .sink { [weak self] _ in
+                self?.updateMenuBarIcon()
+            }
+            .store(in: &cancellables)
+
+        PomodoroManager.shared.$isRunning
+            .sink { [weak self] _ in
+                self?.updateMenuBarIcon()
+            }
+            .store(in: &cancellables)
     }
 
     // メニューバーアイコンをセットアップ
     func setupMenuBar() {
-        // ステータスバーアイテムを作成
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        // ステータスバーアイテムを作成（可変長でテキスト表示に対応）
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         guard let button = statusItem?.button else { return }
 
@@ -118,5 +131,25 @@ class MenuBarManager {
     // アプリを終了
     @objc private func quitApp() {
         NSApplication.shared.terminate(nil)
+    }
+
+    // メニューバーアイコンを更新（タイマー実行中はテキスト表示、停止中はアイコン表示）
+    private func updateMenuBarIcon() {
+        guard let button = statusItem?.button else { return }
+
+        let pomodoroManager = PomodoroManager.shared
+
+        if pomodoroManager.isRunning {
+            // タイマー実行中：テキスト表示
+            button.image = nil
+            button.title = pomodoroManager.getTimeString()
+        } else {
+            // タイマー停止中：アイコン表示
+            button.title = ""
+            if let image = NSImage(systemSymbolName: "text.book.closed", accessibilityDescription: "Flyt") {
+                image.isTemplate = true
+                button.image = image
+            }
+        }
     }
 }
