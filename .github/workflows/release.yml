@@ -57,31 +57,78 @@ jobs:
         id: get_commits
         run: |
           if [ -z "${{ steps.get_previous_tag.outputs.PREV_TAG }}" ]; then
-            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+            COMMITS=$(git log --stat --pretty=format:"## %s (%h)%n" --no-merges | head -n 200)
           else
-            COMMITS=$(git log ${{ steps.get_previous_tag.outputs.PREV_TAG }}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+            COMMITS=$(git log ${{ steps.get_previous_tag.outputs.PREV_TAG }}..HEAD --stat --pretty=format:"## %s (%h)%n" --no-merges)
           fi
           # 改行を保持するためにEOFを使用
           echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Generate Release Notes with Claude
-        uses: anthropics/claude-code-action@v1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            バージョン ${{ steps.get_version.outputs.VERSION }} のリリースノートを生成してください。
+          python-version: '3.12'
 
-            以下のコミット履歴から変更内容を分析し、RELEASE_NOTES.mdファイルを上書きして作成してください：
+      - name: Install dependencies
+        run: pip install anthropic
 
-            ${{ steps.get_commits.outputs.COMMITS }}
+      - name: Generate Release Notes with Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          COMMITS: ${{ steps.get_commits.outputs.COMMITS }}
+        run: |
+          python3 << 'EOF'
+          import os
+          from anthropic import Anthropic
 
-            既存のRELEASE_NOTES.mdと同じフォーマットに従い、ユーザーにとってわかりやすい日本語で記述してください。
-            技術的な詳細よりも、ユーザーが得られる機能や改善点を重視してください。
+          # Claude APIクライアントを初期化
+          client = Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
 
-            重要: 必ずRELEASE_NOTES.mdファイルを作成してください。ファイルパスは /Users/runner/work/flyt/flyt/RELEASE_NOTES.md です。
-          claude_args: "--model claude-sonnet-4-5-20250929 --allowedTools Write,Read"
+          # 既存のRELEASE_NOTES.mdを読み込んでフォーマットを理解
+          with open('RELEASE_NOTES.md', 'r', encoding='utf-8') as f:
+              template = f.read()
+
+          # プロンプトを作成
+          prompt = f"""バージョン {os.environ['VERSION']} のリリースノートを生成してください。
+
+          以下のコミット履歴から変更内容を分析し、ユーザー向けのリリースノートを作成してください：
+
+          {os.environ['COMMITS']}
+
+          以下のテンプレートフォーマットに従ってください。特に「主な変更点」セクションに、このバージョンで追加された新機能、改善、バグ修正を分かりやすく記載してください：
+
+          {template}
+
+          重要な指示：
+          1. コミットメッセージを分析し、新機能、改善、バグ修正に分類してください
+          2. 技術的な詳細よりも、ユーザーが得られるメリットを重視してください
+          3. 日本語で自然に記述してください
+          4. 「主な変更点」セクション以外は既存のテンプレートをそのまま使用してください
+          5. HTMLコメント（<!-- -->）は削除してください
+
+          RELEASE_NOTES.mdの完全な内容のみを出力してください。説明文などは不要です。"""
+
+          # Claude APIを呼び出し
+          message = client.messages.create(
+              model="claude-sonnet-4-5-20250929",
+              max_tokens=4096,
+              messages=[
+                  {"role": "user", "content": prompt}
+              ]
+          )
+
+          # レスポンスを取得
+          release_notes = message.content[0].text
+
+          # RELEASE_NOTES.mdに書き込み
+          with open('RELEASE_NOTES.md', 'w', encoding='utf-8') as f:
+              f.write(release_notes)
+
+          print("リリースノートを生成しました")
+          EOF
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
