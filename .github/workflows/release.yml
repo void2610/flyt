@@ -47,6 +47,42 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Get previous tag
+        id: get_previous_tag
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | sed -n '2p')
+          echo "PREV_TAG=${PREV_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Get commit log
+        id: get_commits
+        run: |
+          if [ -z "${{ steps.get_previous_tag.outputs.PREV_TAG }}" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            COMMITS=$(git log ${{ steps.get_previous_tag.outputs.PREV_TAG }}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          # 改行を保持するためにEOFを使用
+          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate Release Notes with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            バージョン ${{ steps.get_version.outputs.VERSION }} のリリースノートを生成してください。
+
+            以下のコミット履歴から変更内容を分析し、RELEASE_NOTES.mdファイルを上書きして作成してください：
+
+            ${{ steps.get_commits.outputs.COMMITS }}
+
+            既存のRELEASE_NOTES.mdと同じフォーマットに従い、ユーザーにとってわかりやすい日本語で記述してください。
+            技術的な詳細よりも、ユーザーが得られる機能や改善点を重視してください。
+
+            重要: 必ずRELEASE_NOTES.mdファイルを作成してください。ファイルパスは /Users/runner/work/flyt/flyt/RELEASE_NOTES.md です。
+          claude_args: "--model claude-sonnet-4-5-20250929 --allowedTools Write,Read"
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
