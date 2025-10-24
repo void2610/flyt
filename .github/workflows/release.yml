@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: macos-15
@@ -130,19 +134,19 @@ jobs:
           print("リリースノートを生成しました")
           EOF
 
-      - name: Delete existing release if it exists
-        continue-on-error: true
-        run: gh release delete ${{ steps.get_version.outputs.VERSION }} -y
+      - name: Delete existing release and recreate
+        run: |
+          # 既存のリリースを削除（存在する場合）
+          if gh release view ${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
+            echo "既存のリリースを削除します"
+            gh release delete ${{ steps.get_version.outputs.VERSION }} -y
+            sleep 2
+          fi
+
+          # リリースを作成
+          gh release create ${{ steps.get_version.outputs.VERSION }} \
+            --title "Release ${{ steps.get_version.outputs.VERSION }}" \
+            --notes-file RELEASE_NOTES.md \
+            Flyt.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: Flyt.zip
-          name: Release ${{ steps.get_version.outputs.VERSION }}
-          body_path: RELEASE_NOTES.md
-          fail_on_unmatched_files: true
-          generate_release_notes: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
