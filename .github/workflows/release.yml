@@ -52,20 +52,6 @@ jobs:
         with:
           files: Flyt.zip
           name: Release ${{ steps.get_version.outputs.VERSION }}
-          body: |
-            ## Flyt ${{ steps.get_version.outputs.VERSION }}
-
-            ### インストール方法
-            1. `Flyt.zip` をダウンロード
-            2. ZIPファイルを解凍
-            3. `Flyt.app` を `/Applications` フォルダに移動
-            4. アプリを起動し、アクセシビリティ権限を許可
-
-            ### 機能
-            - ポモドーロタイマー（作業時間と休憩時間をカスタマイズ可能）
-            - フルスクリーンアプリの上に表示可能なフローティングウィンドウ
-            - グローバルホットキー（デフォルト: Control+I）
-            - ホットエッジ（画面の端にマウスを移動して起動）
-            - セッション数カウント（毎日0時に自動リセット）
+          body_path: RELEASE_NOTES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
