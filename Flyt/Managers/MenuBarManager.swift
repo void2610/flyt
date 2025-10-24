@@ -48,8 +48,8 @@ class MenuBarManager {
 
     // メニューバーアイコンをセットアップ
     func setupMenuBar() {
-        // ステータスバーアイテムを作成（可変長でテキスト表示に対応）
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        // ステータスバーアイテムを作成（初期はアイコン用の標準幅）
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         guard let button = statusItem?.button else { return }
 
@@ -140,11 +140,13 @@ class MenuBarManager {
         let pomodoroManager = PomodoroManager.shared
 
         if pomodoroManager.isRunning {
-            // タイマー実行中：テキスト表示
+            // タイマー実行中：テキスト表示（幅を45に変更）
+            statusItem?.length = 45
             button.image = nil
             button.title = pomodoroManager.getTimeString()
         } else {
-            // タイマー停止中：アイコン表示
+            // タイマー停止中：アイコン表示（幅を標準に戻す）
+            statusItem?.length = NSStatusItem.squareLength
             button.title = ""
             if let image = NSImage(systemSymbolName: "text.book.closed", accessibilityDescription: "Flyt") {
                 image.isTemplate = true
