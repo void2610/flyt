@@ -13,12 +13,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ジョブ1: アプリケーションのビルド
   build:
     runs-on: macos-15
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
@@ -47,9 +54,23 @@ jobs:
           zip -r Flyt.zip Flyt.app
           mv Flyt.zip ../../../../
 
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flyt-app
+          path: Flyt.zip
+          retention-days: 1
+
+  # ジョブ2: リリースノートの生成
+  generate-notes:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 全履歴を取得
 
       - name: Get previous tag
         id: get_previous_tag
@@ -81,7 +102,7 @@ jobs:
       - name: Generate Release Notes with Claude
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          VERSION: ${{ needs.build.outputs.version }}
           COMMITS: ${{ steps.get_commits.outputs.COMMITS }}
         run: |
           python3 << 'EOF'
@@ -148,18 +169,41 @@ jobs:
           print("リリースノートを生成しました")
           EOF
 
-      - name: Delete existing release and recreate
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: RELEASE_NOTES.md
+          retention-days: 1
+
+  # ジョブ3: GitHubリリースの作成
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build, generate-notes]
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flyt-app
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+
+      - name: Create GitHub Release
         run: |
           # 既存のリリースを削除（存在する場合）
-          if gh release view ${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
+          if gh release view ${{ needs.build.outputs.version }} > /dev/null 2>&1; then
             echo "既存のリリースを削除します"
-            gh release delete ${{ steps.get_version.outputs.VERSION }} -y
+            gh release delete ${{ needs.build.outputs.version }} -y
             sleep 2
           fi
 
           # リリースを作成
-          gh release create ${{ steps.get_version.outputs.VERSION }} \
-            --title "Release ${{ steps.get_version.outputs.VERSION }}" \
+          gh release create ${{ needs.build.outputs.version }} \
+            --title "Release ${{ needs.build.outputs.version }}" \
             --notes-file RELEASE_NOTES.md \
             Flyt.zip
         env:
