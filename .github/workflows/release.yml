@@ -130,11 +130,19 @@ jobs:
           print("リリースノートを生成しました")
           EOF
 
+      - name: Delete existing release if it exists
+        continue-on-error: true
+        run: gh release delete ${{ steps.get_version.outputs.VERSION }} -y
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: Flyt.zip
           name: Release ${{ steps.get_version.outputs.VERSION }}
           body_path: RELEASE_NOTES.md
+          fail_on_unmatched_files: true
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
