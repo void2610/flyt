@@ -182,6 +182,9 @@ jobs:
     needs: [build, generate-notes]
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
