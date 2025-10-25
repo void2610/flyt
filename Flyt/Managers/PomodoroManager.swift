@@ -182,14 +182,14 @@ class PomodoroManager: ObservableObject {
         // タイマーを停止
         pause()
 
-        // サウンドを再生
-        SoundManager.shared.playCompletionSound()
-
         // ウィンドウを最前面に表示
         showWindow()
 
         switch state {
         case .working:
+            // 作業完了サウンドを再生
+            SoundManager.shared.playWorkCompletionSound()
+
             // 作業完了 → 休憩へ（一時停止状態）
             sessionCount += 1
             // セッション数を保存
@@ -202,6 +202,9 @@ class PomodoroManager: ObservableObject {
             remainingSeconds = restDurationMinutes * 60
 
         case .resting:
+            // 休憩完了サウンドを再生
+            SoundManager.shared.playRestCompletionSound()
+
             // 休憩完了 → 作業へ（一時停止状態）
             state = .working
             remainingSeconds = workDurationMinutes * 60

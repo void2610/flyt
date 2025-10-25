@@ -25,7 +25,9 @@ struct UserDefaultsKeys {
     static let hasUserLoggedIn = "hasUserLoggedIn"
 
     // サウンド設定
-    static let soundName = "soundName"
+    static let workCompletionSoundName = "workCompletionSoundName"
+    static let restCompletionSoundName = "restCompletionSoundName"
+    static let soundVolume = "soundVolume"
 
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}

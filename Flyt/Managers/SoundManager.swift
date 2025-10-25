@@ -31,26 +31,57 @@ class SoundManager: ObservableObject {
         "Tink"
     ]
 
-    // サウンド設定
-    @Published var soundName: String {
+    // サウンド設定（作業完了時）
+    @Published var workCompletionSoundName: String {
         didSet {
-            UserDefaults.standard.set(soundName, forKey: UserDefaultsKeys.soundName)
+            UserDefaults.standard.set(workCompletionSoundName, forKey: UserDefaultsKeys.workCompletionSoundName)
+        }
+    }
+
+    // サウンド設定（休憩完了時）
+    @Published var restCompletionSoundName: String {
+        didSet {
+            UserDefaults.standard.set(restCompletionSoundName, forKey: UserDefaultsKeys.restCompletionSoundName)
+        }
+    }
+
+    // 音量設定（0.0 ~ 1.0）
+    @Published var volume: Float {
+        didSet {
+            UserDefaults.standard.set(volume, forKey: UserDefaultsKeys.soundVolume)
         }
     }
 
     private init() {
         // UserDefaultsから設定を読み込み
-        let savedSound = UserDefaults.standard.string(forKey: UserDefaultsKeys.soundName)
-        self.soundName = savedSound ?? "Glass"
+        let savedWorkSound = UserDefaults.standard.string(forKey: UserDefaultsKeys.workCompletionSoundName)
+        self.workCompletionSoundName = savedWorkSound ?? "Glass"
+
+        let savedRestSound = UserDefaults.standard.string(forKey: UserDefaultsKeys.restCompletionSoundName)
+        self.restCompletionSoundName = savedRestSound ?? "Ping"
+
+        let savedVolume = UserDefaults.standard.float(forKey: UserDefaultsKeys.soundVolume)
+        self.volume = savedVolume > 0 ? savedVolume : 0.5 // デフォルトは50%
     }
 
-    // セッション完了時のサウンドを再生
-    func playCompletionSound() {
+    // 作業完了時のサウンドを再生
+    func playWorkCompletionSound() {
+        playSound(named: workCompletionSoundName)
+    }
+
+    // 休憩完了時のサウンドを再生
+    func playRestCompletionSound() {
+        playSound(named: restCompletionSoundName)
+    }
+
+    // サウンドを再生（内部メソッド）
+    private func playSound(named name: String) {
         // 「なし」が選択されている場合は再生しない
-        guard soundName != "なし" else { return }
+        guard name != "なし" else { return }
 
         // システムサウンドを再生
-        if let sound = NSSound(named: soundName) {
+        if let sound = NSSound(named: name) {
+            sound.volume = volume
             sound.play()
         }
     }
@@ -61,6 +92,7 @@ class SoundManager: ObservableObject {
         guard name != "なし" else { return }
 
         if let sound = NSSound(named: name) {
+            sound.volume = volume
             sound.play()
         }
     }
