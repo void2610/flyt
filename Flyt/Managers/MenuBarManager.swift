@@ -140,10 +140,10 @@ class MenuBarManager {
         let pomodoroManager = PomodoroManager.shared
 
         if pomodoroManager.isRunning {
-            // タイマー実行中：テキスト表示（幅を45に変更）
-            statusItem?.length = 45
-            button.image = nil
-            button.title = pomodoroManager.getTimeString()
+            // タイマー実行中：円形メーター + テキスト表示（幅を60に変更）
+            statusItem?.length = 60
+            button.image = createProgressCircleImage(progress: pomodoroManager.getProgress())
+            button.title = " " + pomodoroManager.getTimeString()
         } else {
             // タイマー停止中：アイコン表示（幅を標準に戻す）
             statusItem?.length = NSStatusItem.squareLength
@@ -153,5 +153,54 @@ class MenuBarManager {
                 button.image = image
             }
         }
+    }
+
+    // 進捗を示す円形メーターの画像を生成
+    private func createProgressCircleImage(progress: Double) -> NSImage {
+        let size: CGFloat = 16
+        let lineWidth: CGFloat = 2.0
+
+        let image = NSImage(size: NSSize(width: size, height: size))
+        image.lockFocus()
+
+        // 円の中心と半径
+        let center = CGPoint(x: size / 2, y: size / 2)
+        let radius = (size - lineWidth) / 2
+
+        // 背景円（グレー）
+        NSColor.gray.withAlphaComponent(0.3).setStroke()
+        let backgroundPath = NSBezierPath()
+        backgroundPath.lineWidth = lineWidth
+        backgroundPath.appendArc(
+            withCenter: center,
+            radius: radius,
+            startAngle: 0,
+            endAngle: 360,
+            clockwise: false
+        )
+        backgroundPath.stroke()
+
+        // 進捗円（白または現在のテーマカラー）
+        NSColor.controlAccentColor.setStroke()
+        let progressPath = NSBezierPath()
+        progressPath.lineWidth = lineWidth
+
+        // 進捗に応じて円弧を描画（上から時計回り）
+        let startAngle: CGFloat = 90 // 12時の位置から開始
+        let endAngle = startAngle - (360 * CGFloat(progress))
+
+        progressPath.appendArc(
+            withCenter: center,
+            radius: radius,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            clockwise: true
+        )
+        progressPath.stroke()
+
+        image.unlockFocus()
+        image.isTemplate = true
+
+        return image
     }
 }
