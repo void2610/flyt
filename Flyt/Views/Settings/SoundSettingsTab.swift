@@ -82,7 +82,7 @@ struct SoundSettingsTab: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.red)
+                        .tint(.white)
                     }
 
                     // 休憩完了サウンド選択
@@ -118,32 +118,8 @@ struct SoundSettingsTab: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.green)
+                        .tint(.white)
                     }
-
-                    Divider()
-                        .padding(.vertical, 8)
-
-                    // 説明
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("ℹ️ サウンドについて")
-                            .font(.headline)
-                        Text("• 作業時間と休憩時間が完了したときに、それぞれ異なるサウンドが再生されます")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("• 「なし」を選択するとサウンドは再生されません")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("• 音量はすべてのサウンドに共通で適用されます")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(NSColor.controlBackgroundColor).opacity(0.2))
-                    )
                 }
             }
             .padding(30)
