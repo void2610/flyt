@@ -24,6 +24,9 @@ struct UserDefaultsKeys {
     // 認証フラグ（ユーザーが明示的にログインしたかどうか）
     static let hasUserLoggedIn = "hasUserLoggedIn"
 
+    // サウンド設定
+    static let soundName = "soundName"
+
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}
 }

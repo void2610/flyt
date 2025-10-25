@@ -182,6 +182,9 @@ class PomodoroManager: ObservableObject {
         // タイマーを停止
         pause()
 
+        // サウンドを再生
+        SoundManager.shared.playCompletionSound()
+
         // ウィンドウを最前面に表示
         showWindow()
 
