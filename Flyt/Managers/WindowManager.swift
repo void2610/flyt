@@ -178,6 +178,11 @@ class WindowManager {
 
     // 設定ウィンドウを表示
     func showSettingsWindow() {
+        // タイマーウィンドウを非表示にする
+        if let timerWindow = timerWindow, timerWindow.isVisible {
+            hideWindowWithAnimation(timerWindow)
+        }
+
         // 設定ウィンドウがまだ作成されていない場合は作成
         if settingsWindow == nil {
             createSettingsWindow()
