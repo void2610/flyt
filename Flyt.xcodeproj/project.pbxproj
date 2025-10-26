@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AE05F9832EAE055A00D726AC /* ColorSelector in Frameworks */ = {isa = PBXBuildFile; productRef = AE05F9822EAE055A00D726AC /* ColorSelector */; };
 		AE0F5BAC2EAA058C00FD3427 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = AE0F5BAB2EAA058C00FD3427 /* Auth */; };
 		AE0F5BAE2EAA058C00FD3427 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = AE0F5BAD2EAA058C00FD3427 /* PostgREST */; };
 		AE0F5BB02EAA058C00FD3427 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = AE0F5BAF2EAA058C00FD3427 /* Realtime */; };
@@ -61,6 +62,7 @@
 			files = (
 				AE0F5BB22EAA058C00FD3427 /* Supabase in Frameworks */,
 				AE0F5BB02EAA058C00FD3427 /* Realtime in Frameworks */,
+				AE05F9832EAE055A00D726AC /* ColorSelector in Frameworks */,
 				AE0F5BAE2EAA058C00FD3427 /* PostgREST in Frameworks */,
 				AE0F5BAC2EAA058C00FD3427 /* Auth in Frameworks */,
 			);
@@ -83,12 +85,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AE05F9812EAE055A00D726AC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AE5D89B22EA790FC00C5A09C = {
 			isa = PBXGroup;
 			children = (
 				AE5D89BD2EA790FC00C5A09C /* Flyt */,
 				AE5D89D12EA790FE00C5A09C /* FlytTests */,
 				AE5D89DB2EA790FE00C5A09C /* FlytUITests */,
+				AE05F9812EAE055A00D726AC /* Frameworks */,
 				AE5D89BC2EA790FC00C5A09C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -127,6 +137,7 @@
 				AE0F5BAD2EAA058C00FD3427 /* PostgREST */,
 				AE0F5BAF2EAA058C00FD3427 /* Realtime */,
 				AE0F5BB12EAA058C00FD3427 /* Supabase */,
+				AE05F9822EAE055A00D726AC /* ColorSelector */,
 			);
 			productName = Flyt;
 			productReference = AE5D89BB2EA790FC00C5A09C /* Flyt.app */;
@@ -589,6 +600,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AE05F9822EAE055A00D726AC /* ColorSelector */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE07E11C2EAE02A100113354 /* XCRemoteSwiftPackageReference "ColorSelector" */;
+			productName = ColorSelector;
+		};
 		AE0F5BAB2EAA058C00FD3427 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AE0F5BAA2EAA058C00FD3427 /* XCRemoteSwiftPackageReference "supabase-swift" */;
