@@ -15,7 +15,7 @@ concurrency:
 jobs:
   # ジョブ1: アプリケーションのビルド
   build:
-    runs-on: macos-15
+    runs-on: macos-latest
     outputs:
       version: ${{ steps.get_version.outputs.VERSION }}
 
@@ -28,7 +28,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
       - name: Build app
         run: |
