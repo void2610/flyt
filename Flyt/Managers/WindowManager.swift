@@ -25,6 +25,9 @@ class WindowManager: ObservableObject {
     // ぼかしフィルターへの参照
     private var blurFilter: NSObject?
 
+    // 半透明オーバーレイへの参照
+    private var overlayView: NSView?
+
     // 背景のぼかし強度（0.0〜1.0、デフォルト0.5）
     @Published var windowBlurStrength: Double {
         didSet {
@@ -33,10 +36,22 @@ class WindowManager: ObservableObject {
         }
     }
 
+    // ウィンドウの不透明度（0.0〜1.0、デフォルト0.2）
+    @Published var windowOpacity: Double {
+        didSet {
+            UserDefaults.standard.set(windowOpacity, forKey: UserDefaultsKeys.windowOpacity)
+            updateOverlayOpacity()
+        }
+    }
+
     private init() {
         // UserDefaultsからぼかし強度を読み込み
         let savedStrength = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowBlurStrength)
         self.windowBlurStrength = savedStrength > 0 ? savedStrength : 0.5
+
+        // UserDefaultsから不透明度を読み込み
+        let savedOpacity = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowOpacity)
+        self.windowOpacity = savedOpacity > 0 ? savedOpacity : 0.2
     }
 
     // タイマーウィンドウを作成
@@ -117,6 +132,17 @@ class WindowManager: ObservableObject {
         self.backdropLayer = backdrop
         self.blurFilter = blur
 
+        // 半透明の白いオーバーレイを追加（不透明度制御用）
+        let overlay = NSView(frame: windowRect)
+        overlay.wantsLayer = true
+        overlay.layer?.backgroundColor = NSColor.white.withAlphaComponent(windowOpacity).cgColor
+        overlay.autoresizingMask = [.width, .height]
+
+        containerView.addSubview(overlay)
+
+        // オーバーレイの参照を保存
+        self.overlayView = overlay
+
         // SwiftUIビューをNSHostingViewでラップ
         let contentView = ContentView()
         let hostingView = NSHostingView(rootView: contentView)
@@ -153,6 +179,16 @@ class WindowManager: ObservableObject {
 
         // 参照を更新
         self.blurFilter = newBlur
+    }
+
+    // オーバーレイの不透明度を更新
+    private func updateOverlayOpacity() {
+        guard let overlay = overlayView else { return }
+
+        // windowOpacity をそのまま白いオーバーレイの不透明度として使用
+        // 0.0 (0%) -> 完全に透明（背景が見える）
+        // 1.0 (100%) -> 完全に不透明（白く覆われる）
+        overlay.layer?.backgroundColor = NSColor.white.withAlphaComponent(windowOpacity).cgColor
     }
 
     // ウィンドウの表示/非表示を切り替え

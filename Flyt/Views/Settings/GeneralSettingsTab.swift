@@ -101,13 +101,13 @@ struct GeneralSettingsTab: View {
                 Divider()
                     .padding(.vertical, 8)
 
-                // 背景の透明度設定
+                // 背景のぼかし強度設定
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Image(systemName: "square.fill.on.square.fill")
+                        Image(systemName: "circle.hexagongrid.fill")
                             .foregroundColor(.blue)
                             .font(.title3)
-                        Text("背景の透明度")
+                        Text("背景のぼかし強度")
                             .font(.headline)
                         Spacer()
                         Text("\(Int(windowManager.windowBlurStrength * 100))%")
@@ -118,7 +118,35 @@ struct GeneralSettingsTab: View {
                     Slider(value: $windowManager.windowBlurStrength, in: 0.0...1.0, step: 0.05)
                         .padding(.horizontal, 4)
 
-                    Text("背景のぼかし効果の強さを調整します（UI要素は透明になりません）")
+                    Text("背景のぼかし効果の強さを調整します")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
+
+                // ウィンドウの不透明度設定
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "square.fill.on.square.fill")
+                            .foregroundColor(.purple)
+                            .font(.title3)
+                        Text("ウィンドウの不透明度")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(Int(windowManager.windowOpacity * 100))%")
+                            .font(.system(.body, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+
+                    Slider(value: $windowManager.windowOpacity, in: 0.0...1.0, step: 0.05)
+                        .padding(.horizontal, 4)
+
+                    Text("ウィンドウ全体の不透明度を調整します")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }

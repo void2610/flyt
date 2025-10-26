@@ -31,6 +31,7 @@ struct UserDefaultsKeys {
 
     // UI設定
     static let windowBlurStrength = "windowBlurStrength"
+    static let windowOpacity = "windowOpacity"
 
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}
