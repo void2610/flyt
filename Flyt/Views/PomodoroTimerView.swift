@@ -12,108 +12,123 @@ struct PomodoroTimerView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            VStack(spacing: 0) {
+            VStack(spacing: 30) {
                 Spacer()
 
-            // 状態表示
-            Text(stateText)
-                .font(.title3)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 8)
+                // 円形プログレスゲージ
+                ZStack {
+                    // 背景円
+                    Circle()
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 12)
+                        .frame(width: 300, height: 300)
 
-            // 時間表示
-            Text(manager.getTimeString())
-                .font(.system(size: 100, weight: .thin, design: .rounded))
-                .monospacedDigit()
-                .foregroundColor(stateColor)
-                .padding(.bottom, 12)
+                    // 進捗円
+                    Circle()
+                        .trim(from: 0, to: CGFloat(manager.getProgress()))
+                        .stroke(
+                            stateColor,
+                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                        )
+                        .frame(width: 300, height: 300)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 0.3), value: manager.getProgress())
 
-            // セッション数と合計時間
-            if manager.sessionCount > 0 {
-                VStack(spacing: 4) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.caption)
-                            .foregroundColor(.green)
-                        Text("完了: \(manager.sessionCount)セッション")
-                            .font(.caption)
+                    // 円の中央のコンテンツ
+                    VStack(spacing: 8) {
+                        // 状態表示
+                        Text(stateText)
+                            .font(.title3)
+                            .fontWeight(.medium)
                             .foregroundColor(.secondary)
-                    }
 
-                    Text("合計: \(totalTimeString)")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.bottom, 20)
-            } else {
-                Spacer()
-                    .frame(height: 36)
-            }
+                        // 時間表示
+                        Text(manager.getTimeString())
+                            .font(.system(size: 80, weight: .ultraLight, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundColor(stateColor)
 
-            // コントロールボタン
-            HStack(spacing: 25) {
-                // リセットボタン
-                Button(action: {
-                    manager.reset()
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(NSColor.controlBackgroundColor))
-                            .frame(width: 50, height: 50)
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 20))
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-                .focusable(false)
-                .opacity(manager.state == .idle ? 0.3 : 1.0)
-                .disabled(manager.state == .idle)
+                        // セッション数と合計時間
+                        if manager.sessionCount > 0 {
+                            VStack(spacing: 4) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                    Text("\(manager.sessionCount)セッション")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
 
-                // 開始/一時停止ボタン
-                Button(action: {
-                    if manager.isRunning {
-                        manager.pause()
-                    } else {
-                        manager.start()
-                    }
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(NSColor.controlBackgroundColor))
-                            .frame(width: 70, height: 70)
-                        Image(systemName: manager.isRunning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.primary)
+                                Text("\(totalTimeString)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
                 }
-                .buttonStyle(.plain)
-                .focusable(false)
 
-                // スキップボタン
-                Button(action: {
-                    manager.skipToNext()
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(NSColor.controlBackgroundColor))
-                            .frame(width: 50, height: 50)
-                        Image(systemName: "forward.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(.secondary)
+                // コントロールボタン
+                HStack(spacing: 25) {
+                    // リセットボタン
+                    Button(action: {
+                        manager.reset()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 50, height: 50)
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 20))
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .opacity(manager.state == .idle ? 0.3 : 1.0)
+                    .disabled(manager.state == .idle)
+
+                    // 開始/一時停止ボタン
+                    Button(action: {
+                        if manager.isRunning {
+                            manager.pause()
+                        } else {
+                            manager.start()
+                        }
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.3))
+                                .frame(width: 70, height: 70)
+                            Image(systemName: manager.isRunning ? "pause.fill" : "play.fill")
+                                .font(.system(size: 28))
+                                .foregroundColor(.primary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+
+                    // スキップボタン
+                    Button(action: {
+                        manager.skipToNext()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 50, height: 50)
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .opacity(manager.state == .idle ? 0.3 : 1.0)
+                    .disabled(manager.state == .idle)
                 }
-                .buttonStyle(.plain)
-                .focusable(false)
-                .opacity(manager.state == .idle ? 0.3 : 1.0)
-                .disabled(manager.state == .idle)
-            }
 
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(NSColor.windowBackgroundColor))
 
             // 設定ボタン（右上）
             Button(action: {
@@ -123,7 +138,7 @@ struct PomodoroTimerView: View {
                     .font(.system(size: 16))
                     .foregroundColor(.secondary)
                     .padding(12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+                    .background(Color.white.opacity(0.2))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
