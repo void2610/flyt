@@ -19,21 +19,24 @@ class WindowManager: ObservableObject {
     // 設定ウィンドウ
     private var settingsWindow: NSWindow?
 
-    // NSVisualEffectViewへの参照（不透明度変更のため）
-    private var visualEffectView: NSVisualEffectView?
+    // CABackdropLayerへの参照
+    private var backdropLayer: CALayer?
 
-    // ウィンドウの不透明度（0.0〜1.0、デフォルト0.8）
-    @Published var windowOpacity: Double {
+    // ぼかしフィルターへの参照
+    private var blurFilter: NSObject?
+
+    // 背景のぼかし強度（0.0〜1.0、デフォルト0.5）
+    @Published var windowBlurStrength: Double {
         didSet {
-            UserDefaults.standard.set(windowOpacity, forKey: UserDefaultsKeys.windowOpacity)
-            updateWindowOpacity()
+            UserDefaults.standard.set(windowBlurStrength, forKey: UserDefaultsKeys.windowBlurStrength)
+            updateBlurRadius()
         }
     }
 
     private init() {
-        // UserDefaultsから不透明度を読み込み
-        let savedOpacity = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowOpacity)
-        self.windowOpacity = savedOpacity > 0 ? savedOpacity : 0.8
+        // UserDefaultsからぼかし強度を読み込み
+        let savedStrength = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowBlurStrength)
+        self.windowBlurStrength = savedStrength > 0 ? savedStrength : 0.5
     }
 
     // タイマーウィンドウを作成
@@ -75,35 +78,83 @@ class WindowManager: ObservableObject {
         // 追加設定
         window.hidesOnDeactivate = false
 
-        // NSVisualEffectViewでグラスモーフィズム背景を作成
-        let vfxView = NSVisualEffectView(frame: windowRect)
-        vfxView.material = .hudWindow
-        vfxView.blendingMode = .behindWindow
-        vfxView.state = .active
-        vfxView.wantsLayer = true
-        vfxView.layer?.cornerRadius = 12
-        vfxView.alphaValue = CGFloat(windowOpacity)
+        // 自前でCABackdropLayerを作成してグラスモーフィズム背景を実現
+        let containerView = NSView(frame: windowRect)
+        containerView.wantsLayer = true
+        containerView.layer?.cornerRadius = 12
+        containerView.layer?.masksToBounds = true
 
-        // visualEffectViewを保存（後で不透明度を変更するため）
-        self.visualEffectView = vfxView
+        // Core Imageフィルターを無効化（WindowServerでのレンダリングと競合しないように）
+        containerView.setValue(false, forKey: "layerUsesCoreImageFilters")
+
+        // CABackdropLayerを作成（プライベートクラス）
+        let backdropLayerClass = NSClassFromString("CABackdropLayer") as! CALayer.Type
+        let backdrop = backdropLayerClass.init()
+        backdrop.frame = windowRect
+
+        // WindowServerでのレンダリングを有効化
+        backdrop.setValue(true, forKey: "windowServerAware")
+
+        // 一意のグループ名を設定
+        backdrop.setValue("flyt.backdrop.group", forKey: "groupName")
+
+        // サンプリングサイズを設定（1.0が適切、2.0だと遅くなる）
+        backdrop.setValue(1.0, forKey: "scale")
+
+        // ぼかしフィルターを作成
+        let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
+        let blur = filterClass.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur").takeUnretainedValue() as! NSObject
+
+        // 初期ぼかし半径を設定
+        let initialRadius = windowBlurStrength * 30.0
+        blur.setValue(NSNumber(value: initialRadius), forKey: "inputRadius")
+        blur.setValue(true, forKey: "inputNormalizeEdges")
+
+        // フィルターを適用
+        backdrop.setValue([blur], forKey: "filters")
+
+        // レイヤーを追加
+        containerView.layer?.insertSublayer(backdrop, at: 0)
+
+        // 参照を保存
+        self.backdropLayer = backdrop
+        self.blurFilter = blur
 
         // SwiftUIビューをNSHostingViewでラップ
         let contentView = ContentView()
         let hostingView = NSHostingView(rootView: contentView)
         hostingView.autoresizingMask = [.width, .height]
 
-        // visualEffectViewにhostingViewを追加
-        vfxView.addSubview(hostingView)
-        hostingView.frame = vfxView.bounds
+        // containerViewにhostingViewを追加
+        containerView.addSubview(hostingView)
+        hostingView.frame = containerView.bounds
 
-        window.contentView = vfxView
+        window.contentView = containerView
 
         self.timerWindow = window
     }
 
-    // ウィンドウの不透明度を更新
-    private func updateWindowOpacity() {
-        visualEffectView?.alphaValue = CGFloat(windowOpacity)
+    // ぼかし半径を更新
+    private func updateBlurRadius() {
+        guard let blur = blurFilter else {
+            print("⚠️ blurFilter is nil")
+            return
+        }
+
+        // windowBlurStrength を ぼかし半径にマッピング
+        // 0.0 (0%) -> 半径 0 (ぼかしなし、背景が完全に見える)
+        // 1.0 (100%) -> 半径 30 (最大のぼかし)
+        let blurRadius = windowBlurStrength * 30.0
+
+        print("🔍 Updating blur radius to: \(blurRadius) (strength: \(windowBlurStrength))")
+
+        // inputRadiusを直接設定
+        blur.setValue(NSNumber(value: blurRadius), forKey: "inputRadius")
+
+        // 設定後の値を確認
+        if let currentRadius = blur.value(forKey: "inputRadius") {
+            print("✅ Blur radius set to: \(currentRadius)")
+        }
     }
 
     // ウィンドウの表示/非表示を切り替え

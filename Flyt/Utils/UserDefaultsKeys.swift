@@ -30,7 +30,7 @@ struct UserDefaultsKeys {
     static let soundVolume = "soundVolume"
 
     // UI設定
-    static let windowOpacity = "windowOpacity"
+    static let windowBlurStrength = "windowBlurStrength"
 
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}

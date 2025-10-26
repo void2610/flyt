@@ -101,22 +101,26 @@ struct GeneralSettingsTab: View {
                 Divider()
                     .padding(.vertical, 8)
 
-                // ウィンドウの不透明度設定
+                // 背景の透明度設定
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Image(systemName: "rectangle.fill")
+                        Image(systemName: "square.fill.on.square.fill")
                             .foregroundColor(.blue)
                             .font(.title3)
-                        Text("ウィンドウの不透明度")
+                        Text("背景の透明度")
                             .font(.headline)
                         Spacer()
-                        Text("\(Int(windowManager.windowOpacity * 100))%")
+                        Text("\(Int(windowManager.windowBlurStrength * 100))%")
                             .font(.system(.body, design: .rounded))
                             .foregroundColor(.secondary)
                     }
 
-                    Slider(value: $windowManager.windowOpacity, in: 0.3...1.0, step: 0.1)
+                    Slider(value: $windowManager.windowBlurStrength, in: 0.0...1.0, step: 0.05)
                         .padding(.horizontal, 4)
+
+                    Text("背景のぼかし効果の強さを調整します（UI要素は透明になりません）")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
