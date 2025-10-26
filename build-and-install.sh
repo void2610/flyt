@@ -2,7 +2,7 @@
 
 # Flytをビルドして/Applicationsにインストールするスクリプト
 # 使い方:
-#   ./build-and-install.sh         # リリースビルド（デフォルト）
+#   ./build-and-install.sh release # リリースビルド
 #   ./build-and-install.sh debug   # デバッグビルド
 
 set -e
@@ -11,9 +11,12 @@ set -e
 if [ "$1" == "debug" ]; then
   CONFIGURATION="Debug"
   echo "🔧 デバッグビルドモード"
-else
+elif [ "$1" == "release" ]; then
   CONFIGURATION="Release"
   echo "🚀 リリースビルドモード"
+else
+  echo "ビルド構成を指定してください。"
+  exit 1
 fi
 
 # 既存のFlytアプリを終了
