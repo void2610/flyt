@@ -27,6 +27,30 @@ struct GeneralSettingsTab: View {
                     .font(.title2)
                     .fontWeight(.semibold)
 
+                // 統計情報
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("今日の統計")
+                            .font(.headline)
+                    }
+
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                        Text("完了セッション:")
+                        Spacer()
+                        Text("\(pomodoroManager.sessionCount)")
+                            .font(.system(.body, design: .rounded))
+                            .fontWeight(.semibold)
+                    }
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
+
                 // 作業時間設定
                 HStack {
                     Image(systemName: "timer")
@@ -122,16 +146,7 @@ struct GeneralSettingsTab: View {
                     Text("背景のぼかし効果の強さを調整します")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
-                )
 
-                // ウィンドウの不透明度設定
-                VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Image(systemName: "square.fill.on.square.fill")
                             .foregroundColor(.purple)
@@ -150,16 +165,8 @@ struct GeneralSettingsTab: View {
                     Text("ウィンドウ全体の不透明度を調整します")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
-                )
 
-                // オーバーレイの色設定
-                VStack(alignment: .leading, spacing: 8) {
+                    // オーバーレイの色設定
                     HStack {
                         Image(systemName: "paintpalette.fill")
                             .foregroundColor(.orange)
@@ -174,33 +181,6 @@ struct GeneralSettingsTab: View {
                     Text("オーバーレイの色を調整します")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
-                )
-
-                Divider()
-                    .padding(.vertical, 8)
-
-                // 統計情報
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("今日の統計")
-                            .font(.headline)
-                    }
-
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text("完了セッション:")
-                        Spacer()
-                        Text("\(pomodoroManager.sessionCount)")
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.semibold)
-                    }
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
