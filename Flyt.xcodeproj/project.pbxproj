@@ -212,6 +212,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				AE0F5BAA2EAA058C00FD3427 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				AE07E11C2EAE02A100113354 /* XCRemoteSwiftPackageReference "ColorSelector" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AE5D89BC2EA790FC00C5A09C /* Products */;
@@ -569,6 +570,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AE07E11C2EAE02A100113354 /* XCRemoteSwiftPackageReference "ColorSelector" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jaywcjlove/ColorSelector";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		AE0F5BAA2EAA058C00FD3427 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift";
