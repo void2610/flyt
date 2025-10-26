@@ -44,6 +44,21 @@ class WindowManager: ObservableObject {
         }
     }
 
+    // オーバーレイの色（デフォルトは白）
+    @Published var overlayColor: Color? {
+        didSet {
+            // ColorをNSColorに変換してRGB値を保存
+            guard let color = overlayColor else { return }
+            let nsColor = NSColor(color)
+            if let rgbColor = nsColor.usingColorSpace(.deviceRGB) {
+                UserDefaults.standard.set(rgbColor.redComponent, forKey: UserDefaultsKeys.windowOverlayColorRed)
+                UserDefaults.standard.set(rgbColor.greenComponent, forKey: UserDefaultsKeys.windowOverlayColorGreen)
+                UserDefaults.standard.set(rgbColor.blueComponent, forKey: UserDefaultsKeys.windowOverlayColorBlue)
+            }
+            updateOverlayOpacity()
+        }
+    }
+
     private init() {
         // UserDefaultsからぼかし強度を読み込み
         let savedStrength = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowBlurStrength)
@@ -52,6 +67,13 @@ class WindowManager: ObservableObject {
         // UserDefaultsから不透明度を読み込み
         let savedOpacity = UserDefaults.standard.double(forKey: UserDefaultsKeys.windowOpacity)
         self.windowOpacity = savedOpacity > 0 ? savedOpacity : 0.2
+
+        // UserDefaultsからオーバーレイの色を読み込み（デフォルトは白: 1.0, 1.0, 1.0）
+        let savedRed = UserDefaults.standard.object(forKey: UserDefaultsKeys.windowOverlayColorRed) as? Double ?? 1.0
+        let savedGreen = UserDefaults.standard.object(forKey: UserDefaultsKeys.windowOverlayColorGreen) as? Double ?? 1.0
+        let savedBlue = UserDefaults.standard.object(forKey: UserDefaultsKeys.windowOverlayColorBlue) as? Double ?? 1.0
+
+        self.overlayColor = Color(red: savedRed, green: savedGreen, blue: savedBlue)
     }
 
     // タイマーウィンドウを作成
@@ -132,10 +154,11 @@ class WindowManager: ObservableObject {
         self.backdropLayer = backdrop
         self.blurFilter = blur
 
-        // 半透明の白いオーバーレイを追加（不透明度制御用）
+        // 半透明のオーバーレイを追加（不透明度と色を制御）
         let overlay = NSView(frame: windowRect)
         overlay.wantsLayer = true
-        overlay.layer?.backgroundColor = NSColor.white.withAlphaComponent(windowOpacity).cgColor
+        let nsOverlayColor = NSColor(overlayColor ?? .white).withAlphaComponent(windowOpacity)
+        overlay.layer?.backgroundColor = nsOverlayColor.cgColor
         overlay.autoresizingMask = [.width, .height]
 
         containerView.addSubview(overlay)
@@ -181,14 +204,13 @@ class WindowManager: ObservableObject {
         self.blurFilter = newBlur
     }
 
-    // オーバーレイの不透明度を更新
+    // オーバーレイの不透明度と色を更新
     private func updateOverlayOpacity() {
         guard let overlay = overlayView else { return }
 
-        // windowOpacity をそのまま白いオーバーレイの不透明度として使用
-        // 0.0 (0%) -> 完全に透明（背景が見える）
-        // 1.0 (100%) -> 完全に不透明（白く覆われる）
-        overlay.layer?.backgroundColor = NSColor.white.withAlphaComponent(windowOpacity).cgColor
+        // オーバーレイの色と不透明度を設定
+        let nsOverlayColor = NSColor(overlayColor ?? .white).withAlphaComponent(windowOpacity)
+        overlay.layer?.backgroundColor = nsOverlayColor.cgColor
     }
 
     // ウィンドウの表示/非表示を切り替え

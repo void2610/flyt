@@ -32,6 +32,9 @@ struct UserDefaultsKeys {
     // UI設定
     static let windowBlurStrength = "windowBlurStrength"
     static let windowOpacity = "windowOpacity"
+    static let windowOverlayColorRed = "windowOverlayColorRed"
+    static let windowOverlayColorGreen = "windowOverlayColorGreen"
+    static let windowOverlayColorBlue = "windowOverlayColorBlue"
 
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}

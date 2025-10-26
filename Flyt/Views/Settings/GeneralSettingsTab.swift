@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ColorSelector
 
 struct GeneralSettingsTab: View {
     @ObservedObject var pomodoroManager = PomodoroManager.shared
@@ -147,6 +148,30 @@ struct GeneralSettingsTab: View {
                         .padding(.horizontal, 4)
 
                     Text("ウィンドウ全体の不透明度を調整します")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
+
+                // オーバーレイの色設定
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "paintpalette.fill")
+                            .foregroundColor(.orange)
+                            .font(.title3)
+                        Text("オーバーレイの色")
+                            .font(.headline)
+                        Spacer()
+                        ColorSelector(selection: $windowManager.overlayColor)
+                            .frame(width: 200)
+                    }
+
+                    Text("オーバーレイの色を調整します")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
