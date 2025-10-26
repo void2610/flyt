@@ -51,30 +51,60 @@ struct GeneralSettingsTab: View {
                         .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
                 )
 
-                // 作業時間設定
-                HStack {
-                    Image(systemName: "timer")
-                        .foregroundColor(.red)
-                        .font(.title3)
-                    Text("作業時間")
-                        .font(.headline)
-                    Spacer()
-                    HStack(spacing: 4) {
-                        TextField("", text: $workText)
-                            .textFieldStyle(.plain)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 40)
-                            .focused($focusedField, equals: .work)
-                            .onSubmit {
-                                updateWorkDuration()
-                            }
-                            .onChange(of: focusedField) { oldValue, newValue in
-                                if oldValue == .work && newValue != .work {
+                // 作業時間と休憩時間設定
+                VStack(alignment: .leading, spacing: 12) {
+                    // 作業時間設定
+                    HStack {
+                        Image(systemName: "timer")
+                            .foregroundColor(.red)
+                            .font(.title3)
+                        Text("作業時間")
+                            .font(.headline)
+                        Spacer()
+                        HStack(spacing: 4) {
+                            TextField("", text: $workText)
+                                .textFieldStyle(.plain)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 40)
+                                .focused($focusedField, equals: .work)
+                                .onSubmit {
                                     updateWorkDuration()
                                 }
-                            }
-                        Text("分")
-                            .foregroundColor(.secondary)
+                                .onChange(of: focusedField) { oldValue, newValue in
+                                    if oldValue == .work && newValue != .work {
+                                        updateWorkDuration()
+                                    }
+                                }
+                            Text("分")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    // 休憩時間設定
+                    HStack {
+                        Image(systemName: "cup.and.saucer")
+                            .foregroundColor(.green)
+                            .font(.title3)
+                        Text("休憩時間")
+                            .font(.headline)
+                        Spacer()
+                        HStack(spacing: 4) {
+                            TextField("", text: $restText)
+                                .textFieldStyle(.plain)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 40)
+                                .focused($focusedField, equals: .rest)
+                                .onSubmit {
+                                    updateRestDuration()
+                                }
+                                .onChange(of: focusedField) { oldValue, newValue in
+                                    if oldValue == .rest && newValue != .rest {
+                                        updateRestDuration()
+                                    }
+                                }
+                            Text("分")
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
                 .padding(.vertical, 12)
@@ -85,41 +115,6 @@ struct GeneralSettingsTab: View {
                 )
                 .onAppear {
                     workText = "\(pomodoroManager.workDurationMinutes)"
-                }
-
-                // 休憩時間設定
-                HStack {
-                    Image(systemName: "cup.and.saucer")
-                        .foregroundColor(.green)
-                        .font(.title3)
-                    Text("休憩時間")
-                        .font(.headline)
-                    Spacer()
-                    HStack(spacing: 4) {
-                        TextField("", text: $restText)
-                            .textFieldStyle(.plain)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 40)
-                            .focused($focusedField, equals: .rest)
-                            .onSubmit {
-                                updateRestDuration()
-                            }
-                            .onChange(of: focusedField) { oldValue, newValue in
-                                if oldValue == .rest && newValue != .rest {
-                                    updateRestDuration()
-                                }
-                            }
-                        Text("分")
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
-                )
-                .onAppear {
                     restText = "\(pomodoroManager.restDurationMinutes)"
                 }
 
