@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GeneralSettingsTab: View {
     @ObservedObject var pomodoroManager = PomodoroManager.shared
+    @ObservedObject var windowManager = WindowManager.shared
     @State private var workText: String = ""
     @State private var restText: String = ""
     @FocusState private var focusedField: Field?
@@ -96,6 +97,33 @@ struct GeneralSettingsTab: View {
                 .onAppear {
                     restText = "\(pomodoroManager.restDurationMinutes)"
                 }
+
+                Divider()
+                    .padding(.vertical, 8)
+
+                // ウィンドウの不透明度設定
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "rectangle.fill")
+                            .foregroundColor(.blue)
+                            .font(.title3)
+                        Text("ウィンドウの不透明度")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(Int(windowManager.windowOpacity * 100))%")
+                            .font(.system(.body, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+
+                    Slider(value: $windowManager.windowOpacity, in: 0.3...1.0, step: 0.1)
+                        .padding(.horizontal, 4)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
+                )
 
                 Divider()
                     .padding(.vertical, 8)

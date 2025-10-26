@@ -29,6 +29,9 @@ struct UserDefaultsKeys {
     static let restCompletionSoundName = "restCompletionSoundName"
     static let soundVolume = "soundVolume"
 
+    // UI設定
+    static let windowOpacity = "windowOpacity"
+
     // プライベートイニシャライザで初期化を防ぐ
     private init() {}
 }
