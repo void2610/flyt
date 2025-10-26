@@ -92,14 +92,11 @@ class WindowManager: ObservableObject {
         let backdrop = backdropLayerClass.init()
         backdrop.frame = windowRect
 
-        // WindowServerでのレンダリングを有効化
-        backdrop.setValue(true, forKey: "windowServerAware")
-
-        // 一意のグループ名を設定
-        backdrop.setValue("flyt.backdrop.group", forKey: "groupName")
-
-        // サンプリングサイズを設定（1.0が適切、2.0だと遅くなる）
-        backdrop.setValue(1.0, forKey: "scale")
+        // 必須プロパティを設定
+        backdrop.setValue(true, forKey: "enabled")  // Backdropを有効化
+        backdrop.setValue(true, forKey: "windowServerAware")  // WindowServerでのレンダリング
+        backdrop.setValue("flyt.backdrop.group", forKey: "groupName")  // 一意のグループ名
+        backdrop.setValue(0.25, forKey: "scale")  // サンプリングサイズ（0.25推奨）
 
         // ぼかしフィルターを作成
         let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
@@ -136,25 +133,26 @@ class WindowManager: ObservableObject {
 
     // ぼかし半径を更新
     private func updateBlurRadius() {
-        guard let blur = blurFilter else {
-            print("⚠️ blurFilter is nil")
-            return
-        }
+        guard let backdrop = backdropLayer else { return }
 
         // windowBlurStrength を ぼかし半径にマッピング
         // 0.0 (0%) -> 半径 0 (ぼかしなし、背景が完全に見える)
         // 1.0 (100%) -> 半径 30 (最大のぼかし)
         let blurRadius = windowBlurStrength * 30.0
 
-        print("🔍 Updating blur radius to: \(blurRadius) (strength: \(windowBlurStrength))")
+        // 完全に新しいフィルターオブジェクトを作成
+        let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
+        let newBlur = filterClass.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur").takeUnretainedValue() as! NSObject
 
-        // inputRadiusを直接設定
-        blur.setValue(NSNumber(value: blurRadius), forKey: "inputRadius")
+        // 新しいフィルターにぼかし半径を設定
+        newBlur.setValue(NSNumber(value: blurRadius), forKey: "inputRadius")
+        newBlur.setValue(true, forKey: "inputNormalizeEdges")
 
-        // 設定後の値を確認
-        if let currentRadius = blur.value(forKey: "inputRadius") {
-            print("✅ Blur radius set to: \(currentRadius)")
-        }
+        // 新しいフィルター配列を作成して適用
+        backdrop.setValue([newBlur], forKey: "filters")
+
+        // 参照を更新
+        self.blurFilter = newBlur
     }
 
     // ウィンドウの表示/非表示を切り替え
