@@ -121,6 +121,10 @@ struct GeneralSettingsTab: View {
                 Divider()
                     .padding(.vertical, 8)
 
+                Text("背景設定")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
                 // 背景のぼかし強度設定
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
@@ -214,7 +218,7 @@ struct GeneralSettingsTab: View {
                     .tint(.red)
                 }
             }
-            .padding(30)
+            .padding(50)
             .frame(maxWidth: 450)
         }
         .frame(minWidth: 500, minHeight: 400)

@@ -122,7 +122,7 @@ struct SoundSettingsTab: View {
                     }
                 }
             }
-            .padding(30)
+            .padding(50)
             .frame(maxWidth: 450)
         }
         .frame(minWidth: 500, minHeight: 400)

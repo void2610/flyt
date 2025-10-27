@@ -21,7 +21,7 @@ struct HotEdgeSettingsTab: View {
 
                 HotEdgeSettingsView()
             }
-            .padding(30)
+            .padding(50)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(minWidth: 500, minHeight: 400)
