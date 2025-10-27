@@ -50,6 +50,7 @@ struct SettingsView: View {
                                 .foregroundColor(.primary)
                         }
                         .frame(width: 70, height: 50)
+                        .contentShape(Rectangle())  // クリック判定をフレーム全体に
                         .background(
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(selectedTab == tab ? Color.white.opacity(0.1) : Color.clear)
