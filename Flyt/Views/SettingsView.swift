@@ -61,7 +61,7 @@ struct SettingsView: View {
             .padding(.top, 20)
             .padding(.bottom, 10)
             .frame(maxWidth: .infinity)
-            .background(Color(NSColor.windowBackgroundColor))
+            .background(Color.clear)  // タブバーの背景も透明に
 
             Divider()
 
@@ -86,6 +86,7 @@ struct SettingsView: View {
             }
         }
         .frame(width: 600, height: 450)
+        .background(Color.clear)  // 背景を透明に
     }
 }
 
