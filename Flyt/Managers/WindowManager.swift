@@ -85,6 +85,67 @@ class WindowManager: ObservableObject {
         self.overlayColor = Color(red: savedRed, green: savedGreen, blue: savedBlue)
     }
 
+    // グラスモーフィズム背景を持つコンテナビューを作成
+    private func createGlassmorphismContainer(
+        frame: NSRect,
+        groupName: String,
+        backdropLayerRef: inout CALayer?,
+        blurFilterRef: inout NSObject?,
+        overlayViewRef: inout NSView?
+    ) -> NSView {
+        let containerView = NSView(frame: frame)
+        containerView.wantsLayer = true
+        containerView.layer?.cornerRadius = 12
+        containerView.layer?.masksToBounds = true
+
+        // Core Imageフィルターを無効化（WindowServerでのレンダリングと競合しないように）
+        containerView.setValue(false, forKey: "layerUsesCoreImageFilters")
+
+        // CABackdropLayerを作成（プライベートクラス）
+        let backdropLayerClass = NSClassFromString("CABackdropLayer") as! CALayer.Type
+        let backdrop = backdropLayerClass.init()
+        backdrop.frame = frame
+
+        // 必須プロパティを設定
+        backdrop.setValue(true, forKey: "enabled")  // Backdropを有効化
+        backdrop.setValue(true, forKey: "windowServerAware")  // WindowServerでのレンダリング
+        backdrop.setValue(groupName, forKey: "groupName")  // 一意のグループ名
+        backdrop.setValue(0.25, forKey: "scale")  // サンプリングサイズ（0.25推奨）
+
+        // ぼかしフィルターを作成
+        let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
+        let blur = filterClass.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur").takeUnretainedValue() as! NSObject
+
+        // 初期ぼかし半径を設定
+        let initialRadius = windowBlurStrength * 30.0
+        blur.setValue(NSNumber(value: initialRadius), forKey: "inputRadius")
+        blur.setValue(true, forKey: "inputNormalizeEdges")
+
+        // フィルターを適用
+        backdrop.setValue([blur], forKey: "filters")
+
+        // レイヤーを追加
+        containerView.layer?.insertSublayer(backdrop, at: 0)
+
+        // 参照を保存
+        backdropLayerRef = backdrop
+        blurFilterRef = blur
+
+        // 半透明のオーバーレイを追加（不透明度と色を制御）
+        let overlay = NSView(frame: frame)
+        overlay.wantsLayer = true
+        let nsOverlayColor = NSColor(overlayColor ?? .white).withAlphaComponent(windowOpacity)
+        overlay.layer?.backgroundColor = nsOverlayColor.cgColor
+        overlay.autoresizingMask = [.width, .height]
+
+        containerView.addSubview(overlay)
+
+        // オーバーレイの参照を保存
+        overlayViewRef = overlay
+
+        return containerView
+    }
+
     // タイマーウィンドウを作成
     func createTimerWindow() {
         // ウィンドウのサイズと位置（円形デザインに合わせて正方形に近く）
@@ -124,56 +185,14 @@ class WindowManager: ObservableObject {
         // 追加設定
         window.hidesOnDeactivate = false
 
-        // 自前でCABackdropLayerを作成してグラスモーフィズム背景を実現
-        let containerView = NSView(frame: windowRect)
-        containerView.wantsLayer = true
-        containerView.layer?.cornerRadius = 12
-        containerView.layer?.masksToBounds = true
-
-        // Core Imageフィルターを無効化（WindowServerでのレンダリングと競合しないように）
-        containerView.setValue(false, forKey: "layerUsesCoreImageFilters")
-
-        // CABackdropLayerを作成（プライベートクラス）
-        let backdropLayerClass = NSClassFromString("CABackdropLayer") as! CALayer.Type
-        let backdrop = backdropLayerClass.init()
-        backdrop.frame = windowRect
-
-        // 必須プロパティを設定
-        backdrop.setValue(true, forKey: "enabled")  // Backdropを有効化
-        backdrop.setValue(true, forKey: "windowServerAware")  // WindowServerでのレンダリング
-        backdrop.setValue("flyt.backdrop.group", forKey: "groupName")  // 一意のグループ名
-        backdrop.setValue(0.25, forKey: "scale")  // サンプリングサイズ（0.25推奨）
-
-        // ぼかしフィルターを作成
-        let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
-        let blur = filterClass.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur").takeUnretainedValue() as! NSObject
-
-        // 初期ぼかし半径を設定
-        let initialRadius = windowBlurStrength * 30.0
-        blur.setValue(NSNumber(value: initialRadius), forKey: "inputRadius")
-        blur.setValue(true, forKey: "inputNormalizeEdges")
-
-        // フィルターを適用
-        backdrop.setValue([blur], forKey: "filters")
-
-        // レイヤーを追加
-        containerView.layer?.insertSublayer(backdrop, at: 0)
-
-        // 参照を保存
-        self.timerBackdropLayer = backdrop
-        self.timerBlurFilter = blur
-
-        // 半透明のオーバーレイを追加（不透明度と色を制御）
-        let overlay = NSView(frame: windowRect)
-        overlay.wantsLayer = true
-        let nsOverlayColor = NSColor(overlayColor ?? .white).withAlphaComponent(windowOpacity)
-        overlay.layer?.backgroundColor = nsOverlayColor.cgColor
-        overlay.autoresizingMask = [.width, .height]
-
-        containerView.addSubview(overlay)
-
-        // オーバーレイの参照を保存
-        self.timerOverlayView = overlay
+        // グラスモーフィズム背景を持つコンテナビューを作成
+        let containerView = createGlassmorphismContainer(
+            frame: windowRect,
+            groupName: "flyt.backdrop.group",
+            backdropLayerRef: &timerBackdropLayer,
+            blurFilterRef: &timerBlurFilter,
+            overlayViewRef: &timerOverlayView
+        )
 
         // SwiftUIビューをNSHostingViewでラップ
         let contentView = ContentView()
@@ -355,56 +374,14 @@ class WindowManager: ObservableObject {
         // 通常のウィンドウレベル（設定ウィンドウはフルスクリーン上に表示する必要はない）
         window.level = .normal
 
-        // 自前でCABackdropLayerを作成してグラスモーフィズム背景を実現
-        let containerView = NSView(frame: windowRect)
-        containerView.wantsLayer = true
-        containerView.layer?.cornerRadius = 12
-        containerView.layer?.masksToBounds = true
-
-        // Core Imageフィルターを無効化（WindowServerでのレンダリングと競合しないように）
-        containerView.setValue(false, forKey: "layerUsesCoreImageFilters")
-
-        // CABackdropLayerを作成（プライベートクラス）
-        let backdropLayerClass = NSClassFromString("CABackdropLayer") as! CALayer.Type
-        let backdrop = backdropLayerClass.init()
-        backdrop.frame = windowRect
-
-        // 必須プロパティを設定
-        backdrop.setValue(true, forKey: "enabled")  // Backdropを有効化
-        backdrop.setValue(true, forKey: "windowServerAware")  // WindowServerでのレンダリング
-        backdrop.setValue("flyt.settings.backdrop.group", forKey: "groupName")  // 一意のグループ名
-        backdrop.setValue(0.25, forKey: "scale")  // サンプリングサイズ（0.25推奨）
-
-        // ぼかしフィルターを作成
-        let filterClass = NSClassFromString("CAFilter") as! NSObject.Type
-        let blur = filterClass.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur").takeUnretainedValue() as! NSObject
-
-        // 初期ぼかし半径を設定
-        let initialRadius = windowBlurStrength * 30.0
-        blur.setValue(NSNumber(value: initialRadius), forKey: "inputRadius")
-        blur.setValue(true, forKey: "inputNormalizeEdges")
-
-        // フィルターを適用
-        backdrop.setValue([blur], forKey: "filters")
-
-        // レイヤーを追加
-        containerView.layer?.insertSublayer(backdrop, at: 0)
-
-        // 参照を保存
-        self.settingsBackdropLayer = backdrop
-        self.settingsBlurFilter = blur
-
-        // 半透明のオーバーレイを追加（不透明度と色を制御）
-        let overlay = NSView(frame: windowRect)
-        overlay.wantsLayer = true
-        let nsOverlayColor = NSColor(overlayColor ?? .white).withAlphaComponent(windowOpacity)
-        overlay.layer?.backgroundColor = nsOverlayColor.cgColor
-        overlay.autoresizingMask = [.width, .height]
-
-        containerView.addSubview(overlay)
-
-        // オーバーレイの参照を保存
-        self.settingsOverlayView = overlay
+        // グラスモーフィズム背景を持つコンテナビューを作成
+        let containerView = createGlassmorphismContainer(
+            frame: windowRect,
+            groupName: "flyt.settings.backdrop.group",
+            backdropLayerRef: &settingsBackdropLayer,
+            blurFilterRef: &settingsBlurFilter,
+            overlayViewRef: &settingsOverlayView
+        )
 
         // SwiftUIビューをNSHostingViewでラップ
         let contentView = SettingsView()
