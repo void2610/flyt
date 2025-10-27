@@ -52,14 +52,14 @@ struct SettingsView: View {
                         .frame(width: 70, height: 50)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(selectedTab == tab ? Color.white.opacity(0.1) : Color(NSColor.windowBackgroundColor).opacity(0.5))
+                                .fill(selectedTab == tab ? Color.white.opacity(0.1) : Color.clear)
                         )
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, 20)
-            .padding(.bottom, 10)
+            .padding(.top, 30)
+            .padding(.bottom, 5)
             .frame(maxWidth: .infinity)
             .background(Color.clear)  // タブバーの背景も透明に
 
