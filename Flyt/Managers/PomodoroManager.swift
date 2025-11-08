@@ -210,7 +210,9 @@ class PomodoroManager: ObservableObject {
             remainingSeconds = workDurationMinutes * 60
 
             // 休憩完了時にもクラウドから同期
-            SyncManager.shared.syncToCloud(sessionCount: sessionCount)
+            Task {
+                SyncManager.shared.syncToCloud(sessionCount: sessionCount)
+            }
 
         case .idle:
             // 何もしない
