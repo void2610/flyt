@@ -209,6 +209,9 @@ class PomodoroManager: ObservableObject {
             state = .working
             remainingSeconds = workDurationMinutes * 60
 
+            // 休憩完了時にもクラウドから同期
+            SyncManager.shared.syncToCloud(sessionCount: sessionCount)
+
         case .idle:
             // 何もしない
             break

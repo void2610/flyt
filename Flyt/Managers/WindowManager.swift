@@ -278,6 +278,11 @@ class WindowManager: ObservableObject {
     func showWindow() {
         guard let window = timerWindow else { return }
 
+        // タイマーウィンドウ表示時にクラウドから同期
+        Task {
+            await SyncManager.shared.syncFromCloud()
+        }
+
         if !window.isVisible {
             showWindowWithAnimation(window)
         } else {
