@@ -112,10 +112,18 @@ class SyncManager: ObservableObject {
                 .value
 
             if let sessionData = response.first {
-                // サーバーのデータを常に適用（Server as Source of Truth）
-                onSessionCountUpdated?(sessionData.sessionCount)
-                UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
-                lastSyncMessage = "✅ クラウドから取得 (count=\(sessionData.sessionCount))"
+                // ローカルのタイムスタンプと比較
+                let localLastUpdated = UserDefaults.standard.object(forKey: UserDefaultsKeys.lastUpdated) as? Date
+
+                // ローカルデータの方が新しい場合は更新しない
+                if let localTimestamp = localLastUpdated, localTimestamp > sessionData.lastUpdated {
+                    lastSyncMessage = "ℹ️ ローカルデータの方が新しいためスキップ (local=\(localTimestamp), cloud=\(sessionData.lastUpdated))"
+                } else {
+                    // サーバーのデータを適用（Server as Source of Truth）
+                    onSessionCountUpdated?(sessionData.sessionCount)
+                    UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
+                    lastSyncMessage = "✅ クラウドから取得 (count=\(sessionData.sessionCount))"
+                }
             } else {
                 lastSyncMessage = "ℹ️ クラウドにデータがありません"
             }
