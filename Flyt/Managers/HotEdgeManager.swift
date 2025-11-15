@@ -123,13 +123,17 @@ class HotEdgeManager: ObservableObject {
 
     // マウス移動イベントを処理
     private func handleMouseMove(_ event: NSEvent) {
-        guard let screen = NSScreen.main else { return }
-
         let mouseLocation = NSEvent.mouseLocation
-        let screenFrame = screen.frame
 
-        // マウスがホットエッジにあるかチェック
-        if isInHotEdge(mouseLocation: mouseLocation, screenFrame: screenFrame) {
+        // マウスカーソルが現在あるスクリーンを取得
+        guard let currentScreen = NSScreen.screens.first(where: { screen in
+            NSMouseInRect(mouseLocation, screen.frame, false)
+        }) else { return }
+
+        let screenFrame = currentScreen.frame
+
+        // マウスがホットエッジにあるかチェック（マルチモニター境界を除外）
+        if isInHotEdge(mouseLocation: mouseLocation, screenFrame: screenFrame, currentScreen: currentScreen) {
             // タイマーがまだ開始されていない場合のみ開始
             if triggerTimer == nil {
                 triggerTimer = Timer.scheduledTimer(withTimeInterval: triggerDelay, repeats: false) { [weak self] _ in
@@ -144,20 +148,82 @@ class HotEdgeManager: ObservableObject {
         }
     }
 
-    // マウスがホットエッジにあるかチェック
-    private func isInHotEdge(mouseLocation: CGPoint, screenFrame: CGRect) -> Bool {
+    // マウスがホットエッジにあるかチェック（マルチモニター境界を除外）
+    private func isInHotEdge(mouseLocation: CGPoint, screenFrame: CGRect, currentScreen: NSScreen) -> Bool {
+        // マウスがエッジ付近にいるかチェック
+        let isNearEdge: Bool
         switch selectedEdge {
         case .top:
-            return mouseLocation.y >= screenFrame.maxY - edgeThreshold
+            isNearEdge = mouseLocation.y >= screenFrame.maxY - edgeThreshold
         case .bottom:
-            return mouseLocation.y <= screenFrame.minY + edgeThreshold
+            isNearEdge = mouseLocation.y <= screenFrame.minY + edgeThreshold
         case .left:
-            return mouseLocation.x <= screenFrame.minX + edgeThreshold
+            isNearEdge = mouseLocation.x <= screenFrame.minX + edgeThreshold
         case .right:
-            return mouseLocation.x >= screenFrame.maxX - edgeThreshold
+            isNearEdge = mouseLocation.x >= screenFrame.maxX - edgeThreshold
         case .disabled:
             return false
         }
+
+        // エッジ付近にいない場合は早期リターン
+        guard isNearEdge else { return false }
+
+        // マルチモニター境界かどうかをチェック
+        // 他のスクリーンとの境界である場合はfalseを返す
+        if hasAdjacentScreen(currentScreen: currentScreen, edge: selectedEdge) {
+            return false
+        }
+
+        return true
+    }
+
+    // 指定したエッジに隣接するスクリーンがあるかチェック
+    private func hasAdjacentScreen(currentScreen: NSScreen, edge: HotEdge) -> Bool {
+        let currentFrame = currentScreen.frame
+        let adjacencyThreshold: CGFloat = 10.0  // 隣接判定の閾値
+
+        for screen in NSScreen.screens where screen != currentScreen {
+            let otherFrame = screen.frame
+
+            switch edge {
+            case .top:
+                // 上エッジ: 他のスクリーンの下端が現在のスクリーンの上端と接している
+                if abs(otherFrame.minY - currentFrame.maxY) < adjacencyThreshold {
+                    // X座標が重なっているかチェック
+                    if otherFrame.maxX > currentFrame.minX && otherFrame.minX < currentFrame.maxX {
+                        return true
+                    }
+                }
+            case .bottom:
+                // 下エッジ: 他のスクリーンの上端が現在のスクリーンの下端と接している
+                if abs(otherFrame.maxY - currentFrame.minY) < adjacencyThreshold {
+                    // X座標が重なっているかチェック
+                    if otherFrame.maxX > currentFrame.minX && otherFrame.minX < currentFrame.maxX {
+                        return true
+                    }
+                }
+            case .left:
+                // 左エッジ: 他のスクリーンの右端が現在のスクリーンの左端と接している
+                if abs(otherFrame.maxX - currentFrame.minX) < adjacencyThreshold {
+                    // Y座標が重なっているかチェック
+                    if otherFrame.maxY > currentFrame.minY && otherFrame.minY < currentFrame.maxY {
+                        return true
+                    }
+                }
+            case .right:
+                // 右エッジ: 他のスクリーンの左端が現在のスクリーンの右端と接している
+                if abs(otherFrame.minX - currentFrame.maxX) < adjacencyThreshold {
+                    // Y座標が重なっているかチェック
+                    if otherFrame.maxY > currentFrame.minY && otherFrame.minY < currentFrame.maxY {
+                        return true
+                    }
+                }
+            case .disabled:
+                return false
+            }
+        }
+
+        return false
     }
 
     // ホットエッジをトリガー
