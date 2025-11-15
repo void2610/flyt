@@ -194,6 +194,8 @@ class PomodoroManager: ObservableObject {
             sessionCount += 1
             // セッション数を保存
             UserDefaults.standard.set(sessionCount, forKey: UserDefaultsKeys.sessionCount)
+            // タイムスタンプを更新（同期競合を防ぐため）
+            UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.lastUpdated)
 
             // クラウドに同期
             SyncManager.shared.syncToCloud(sessionCount: sessionCount)
