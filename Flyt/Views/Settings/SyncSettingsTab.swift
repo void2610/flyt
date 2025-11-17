@@ -209,34 +209,32 @@ struct SyncSettingsTab: View {
 
             // 同期メッセージ
             if !syncManager.lastSyncMessage.isEmpty {
-                HStack {
-                    if syncManager.lastSyncMessage.contains("✅") {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    } else if syncManager.lastSyncMessage.contains("⚠️") || syncManager.lastSyncMessage.contains("❌") {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.orange)
-                    } else {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(.blue)
-                    }
-                    Text(syncManager.lastSyncMessage)
-                        .font(.caption)
-                        .lineLimit(3)
-                }
+                syncMessageView
             }
 
-            // 同期エラー
-            if let syncError = syncManager.syncError {
-                HStack {
+            // 同期エラー（lastSyncStatusがerrorの場合は、既にsyncMessageViewで表示されているので不要）
+            if let syncError = syncManager.syncError, syncManager.lastSyncStatus != .error {
+                HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                    Text("同期エラー:")
-                    Text(syncError)
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                        .lineLimit(2)
+                        .foregroundColor(.red)
+                        .font(.body)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("同期エラー")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.red)
+                        Text(syncError)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(2)
+                    }
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.red.opacity(0.1))
+                )
             }
 
             // 手動同期ボタン
@@ -275,6 +273,94 @@ struct SyncSettingsTab: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(NSColor.controlBackgroundColor).opacity(0.3))
         )
+    }
+
+    // 同期メッセージビュー
+    private var syncMessageView: some View {
+        HStack(spacing: 8) {
+            // ステータスに応じたアイコンと色
+            Group {
+                switch syncManager.lastSyncStatus {
+                case .success:
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                case .warning:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                case .error:
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                case .info, .idle:
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.blue)
+                }
+            }
+            .font(.body)
+
+            VStack(alignment: .leading, spacing: 2) {
+                // ステータスラベル
+                Text(statusLabel)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(statusColor)
+
+                // メッセージ
+                Text(syncManager.lastSyncMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(3)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(statusBackgroundColor)
+        )
+    }
+
+    // ステータスラベル
+    private var statusLabel: String {
+        switch syncManager.lastSyncStatus {
+        case .success:
+            return "成功"
+        case .warning:
+            return "警告"
+        case .error:
+            return "エラー"
+        case .info:
+            return "情報"
+        case .idle:
+            return ""
+        }
+    }
+
+    // ステータスの色
+    private var statusColor: Color {
+        switch syncManager.lastSyncStatus {
+        case .success:
+            return .green
+        case .warning:
+            return .orange
+        case .error:
+            return .red
+        case .info, .idle:
+            return .blue
+        }
+    }
+
+    // ステータスの背景色
+    private var statusBackgroundColor: Color {
+        switch syncManager.lastSyncStatus {
+        case .success:
+            return Color.green.opacity(0.1)
+        case .warning:
+            return Color.orange.opacity(0.1)
+        case .error:
+            return Color.red.opacity(0.1)
+        case .info, .idle:
+            return Color.blue.opacity(0.1)
+        }
     }
 
     // 日付フォーマット

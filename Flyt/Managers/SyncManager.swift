@@ -37,6 +37,16 @@ class SyncManager: ObservableObject {
     @Published var lastSyncDate: Date?
     @Published var syncError: String?
     @Published var lastSyncMessage: String = ""
+    @Published var lastSyncStatus: SyncStatus = .idle
+
+    // 同期状態の種類
+    enum SyncStatus {
+        case idle
+        case success
+        case warning
+        case error
+        case info
+    }
 
     // Supabaseクライアント
     private var supabase: Supabase.SupabaseClient? {
@@ -117,15 +127,18 @@ class SyncManager: ObservableObject {
 
                 // ローカルデータの方が新しい場合は更新しない
                 if let localTimestamp = localLastUpdated, localTimestamp > sessionData.lastUpdated {
-                    lastSyncMessage = "ℹ️ ローカルデータの方が新しいためスキップ (local=\(localTimestamp), cloud=\(sessionData.lastUpdated))"
+                    lastSyncMessage = "ローカルデータの方が新しいため、取得をスキップしました"
+                    lastSyncStatus = .info
                 } else {
                     // サーバーのデータを適用（Server as Source of Truth）
                     onSessionCountUpdated?(sessionData.sessionCount)
                     UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
-                    lastSyncMessage = "✅ クラウドから取得 (count=\(sessionData.sessionCount))"
+                    lastSyncMessage = "クラウドからデータを取得しました（\(sessionData.sessionCount)セッション）"
+                    lastSyncStatus = .success
                 }
             } else {
-                lastSyncMessage = "ℹ️ クラウドにデータがありません"
+                lastSyncMessage = "クラウドにデータがありません"
+                lastSyncStatus = .info
             }
 
             lastSyncDate = Date()
@@ -134,6 +147,7 @@ class SyncManager: ObservableObject {
         } catch {
             print("同期エラー: \(error)")
             syncError = error.localizedDescription
+            lastSyncStatus = .error
         }
     }
 
@@ -141,20 +155,23 @@ class SyncManager: ObservableObject {
     func syncToCloud(sessionCount: Int) {
         guard SupabaseClientWrapper.shared.isConfigured else {
             Task { @MainActor in
-                self.lastSyncMessage = "⚠️ Supabaseが設定されていません"
+                self.lastSyncMessage = "Supabaseが設定されていません"
+                self.lastSyncStatus = .warning
             }
             return
         }
         guard let userIdString = AuthManager.shared.userId,
               let userId = UUID(uuidString: userIdString) else {
             Task { @MainActor in
-                self.lastSyncMessage = "⚠️ ログインしていません"
+                self.lastSyncMessage = "ログインしていません"
+                self.lastSyncStatus = .warning
             }
             return
         }
 
         Task { @MainActor in
-            self.lastSyncMessage = "📤 アップロード中... (count=\(sessionCount))"
+            self.lastSyncMessage = "アップロード中..."
+            self.lastSyncStatus = .info
             await performSyncToCloud(userId: userId, sessionCount: sessionCount)
         }
     }
@@ -162,7 +179,8 @@ class SyncManager: ObservableObject {
     @MainActor
     private func performSyncToCloud(userId: UUID, sessionCount: Int) async {
         guard let supabase = supabase else {
-            lastSyncMessage = "⚠️ Supabaseクライアントが取得できません"
+            lastSyncMessage = "Supabaseクライアントが取得できません"
+            lastSyncStatus = .warning
             return
         }
 
@@ -181,8 +199,6 @@ class SyncManager: ObservableObject {
                 lastUpdated: now,
                 deviceId: deviceId
             )
-
-            lastSyncMessage = "📝 送信中... (date=\(today), count=\(sessionCount))"
 
             // まず既存のデータを確認
             let existing: [SessionData] = try await supabase
@@ -212,11 +228,13 @@ class SyncManager: ObservableObject {
             lastSyncDate = Date()
             syncError = nil
 
-            lastSyncMessage = "✅ アップロード成功 (count=\(sessionCount))"
+            lastSyncMessage = "データをアップロードしました（\(sessionCount)セッション）"
+            lastSyncStatus = .success
 
         } catch {
             syncError = error.localizedDescription
-            lastSyncMessage = "❌ エラー: \(error.localizedDescription)"
+            lastSyncMessage = error.localizedDescription
+            lastSyncStatus = .error
         }
     }
 
