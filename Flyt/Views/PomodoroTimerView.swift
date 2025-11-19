@@ -128,69 +128,45 @@ struct PomodoroTimerView: View {
                     .disabled(manager.state == .idle)
                 }
 
-                // 同期ボタン（ログイン時のみ表示）
-                if authManager.isAuthenticated {
-                    HStack(spacing: 12) {
-                        Button(action: {
-                            Task {
-                                await syncManager.syncFromCloud()
-                            }
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 14))
-                                Text("取得")
-                                    .font(.system(size: 12))
-                            }
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.1))
-                            .cornerRadius(12)
-                        }
-                        .buttonStyle(.plain)
-                        .focusable(false)
-                        .disabled(syncManager.isSyncing)
-
-                        Button(action: {
-                            let sessionCount = manager.sessionCount
-                            syncManager.syncToCloud(sessionCount: sessionCount)
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "arrow.up.circle")
-                                    .font(.system(size: 14))
-                                Text("送信")
-                                    .font(.system(size: 12))
-                            }
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.1))
-                            .cornerRadius(12)
-                        }
-                        .buttonStyle(.plain)
-                        .focusable(false)
-                        .disabled(syncManager.isSyncing)
-                    }
-                }
-
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // 設定ボタン（右上）
-            Button(action: {
-                WindowManager.shared.showSettingsWindow()
-            }) {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(.secondary)
-                    .padding(12)
-                    .background(Color.white.opacity(0.2))
-                    .clipShape(Circle())
+            // 右上のボタン（同期ボタンと設定ボタン）
+            HStack(spacing: 8) {
+                // 同期ボタン（ログイン時のみ表示）
+                if authManager.isAuthenticated {
+                    Button(action: {
+                        Task {
+                            await syncManager.syncFromCloud()
+                        }
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .font(.system(size: 16))
+                            .foregroundColor(.secondary)
+                            .padding(12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .disabled(syncManager.isSyncing)
+                }
+
+                // 設定ボタン
+                Button(action: {
+                    WindowManager.shared.showSettingsWindow()
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
+                        .padding(12)
+                        .background(Color.white.opacity(0.2))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .focusable(false)
             }
-            .buttonStyle(.plain)
-            .focusable(false)
             .padding(16)
         }
     }
