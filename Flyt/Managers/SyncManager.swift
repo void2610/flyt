@@ -60,6 +60,9 @@ class SyncManager: ObservableObject {
     private var realtimeChannel: RealtimeChannelV2?
     private var cancellables = Set<AnyCancellable>()
 
+    // 定期同期タイマー
+    private var periodicSyncTimer: Timer?
+
     // 同期コールバック
     var onSessionCountUpdated: ((Int) -> Void)?
 
@@ -90,6 +93,9 @@ class SyncManager: ObservableObject {
 
         // リアルタイムリスナーを開始
         setupRealtimeListener()
+
+        // 定期同期を開始
+        startPeriodicSync()
     }
 
     // 同期を停止
@@ -98,11 +104,31 @@ class SyncManager: ObservableObject {
             await realtimeChannel?.unsubscribe()
             realtimeChannel = nil
         }
+        stopPeriodicSync()
+    }
+
+    // 定期同期を開始
+    private func startPeriodicSync() {
+        // 既存のタイマーを停止
+        stopPeriodicSync()
+
+        // 1分間隔で同期
+        periodicSyncTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                await self?.syncFromCloud(allowDecrease: false)
+            }
+        }
+    }
+
+    // 定期同期を停止
+    private func stopPeriodicSync() {
+        periodicSyncTimer?.invalidate()
+        periodicSyncTimer = nil
     }
 
     // クラウドからデータを取得してローカルに反映
     @MainActor
-    func syncFromCloud() async {
+    func syncFromCloud(allowDecrease: Bool = false) async {
         guard let supabase = supabase else { return }
         guard let userId = AuthManager.shared.userId else { return }
 
@@ -130,11 +156,19 @@ class SyncManager: ObservableObject {
                     lastSyncMessage = "ローカルデータの方が新しいため、取得をスキップしました"
                     lastSyncStatus = .info
                 } else {
-                    // サーバーのデータを適用（Server as Source of Truth）
-                    onSessionCountUpdated?(sessionData.sessionCount)
-                    UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
-                    lastSyncMessage = "クラウドからデータを取得しました（\(sessionData.sessionCount)セッション）"
-                    lastSyncStatus = .success
+                    // セッション数の減少チェック
+                    let currentSessionCount = UserDefaults.standard.integer(forKey: UserDefaultsKeys.sessionCount)
+
+                    if !allowDecrease && sessionData.sessionCount < currentSessionCount {
+                        lastSyncMessage = "セッション数の減少を検出したため、取得をスキップしました（ローカル: \(currentSessionCount)、クラウド: \(sessionData.sessionCount)）"
+                        lastSyncStatus = .warning
+                    } else {
+                        // サーバーのデータを適用（Server as Source of Truth）
+                        onSessionCountUpdated?(sessionData.sessionCount)
+                        UserDefaults.standard.set(sessionData.lastUpdated, forKey: UserDefaultsKeys.lastUpdated)
+                        lastSyncMessage = "クラウドからデータを取得しました（\(sessionData.sessionCount)セッション）"
+                        lastSyncStatus = .success
+                    }
                 }
             } else {
                 lastSyncMessage = "クラウドにデータがありません"
@@ -275,7 +309,7 @@ class SyncManager: ObservableObject {
     private func handleRealtimeChange(_ action: AnyAction) async {
         // 今のところ、定期的なポーリングで同期するシンプルな実装にする
         // Realtimeの詳細なレコード処理は今後の実装で対応
-        await syncFromCloud()
+        await syncFromCloud(allowDecrease: false)
     }
 
     // 今日の日付文字列を取得
