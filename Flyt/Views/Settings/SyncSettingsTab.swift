@@ -242,7 +242,7 @@ struct SyncSettingsTab: View {
                 HStack(spacing: 12) {
                     Button(action: {
                         Task {
-                            await syncManager.syncFromCloud()
+                            await syncManager.syncFromCloud(allowDecrease: true)
                         }
                     }) {
                         HStack {
