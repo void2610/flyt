@@ -278,17 +278,17 @@ class WindowManager: ObservableObject {
     func showWindow() {
         guard let window = timerWindow else { return }
 
-        // タイマーウィンドウ表示時にクラウドから同期
-        Task {
-            await SyncManager.shared.syncFromCloud()
-        }
-
         if !window.isVisible {
             showWindowWithAnimation(window)
         } else {
             // 既に表示されている場合は最前面に
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
+        }
+
+        // ウィンドウ表示後にクラウドから同期（非同期で実行し、ウィンドウ表示をブロックしない）
+        Task { @MainActor in
+            await SyncManager.shared.syncFromCloud(allowDecrease: false)
         }
     }
 
