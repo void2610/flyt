@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PomodoroTimerView: View {
     @ObservedObject var manager = PomodoroManager.shared
+    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var syncManager = SyncManager.shared
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -124,6 +126,52 @@ struct PomodoroTimerView: View {
                     .focusable(false)
                     .opacity(manager.state == .idle ? 0.3 : 1.0)
                     .disabled(manager.state == .idle)
+                }
+
+                // 同期ボタン（ログイン時のみ表示）
+                if authManager.isAuthenticated {
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            Task {
+                                await syncManager.syncFromCloud()
+                            }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 14))
+                                Text("取得")
+                                    .font(.system(size: 12))
+                            }
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(12)
+                        }
+                        .buttonStyle(.plain)
+                        .focusable(false)
+                        .disabled(syncManager.isSyncing)
+
+                        Button(action: {
+                            let sessionCount = manager.sessionCount
+                            syncManager.syncToCloud(sessionCount: sessionCount)
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.up.circle")
+                                    .font(.system(size: 14))
+                                Text("送信")
+                                    .font(.system(size: 12))
+                            }
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(12)
+                        }
+                        .buttonStyle(.plain)
+                        .focusable(false)
+                        .disabled(syncManager.isSyncing)
+                    }
                 }
 
                 Spacer()
