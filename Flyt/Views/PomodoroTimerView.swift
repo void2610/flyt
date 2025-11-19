@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PomodoroTimerView: View {
     @ObservedObject var manager = PomodoroManager.shared
+    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var syncManager = SyncManager.shared
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -130,19 +132,41 @@ struct PomodoroTimerView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // 設定ボタン（右上）
-            Button(action: {
-                WindowManager.shared.showSettingsWindow()
-            }) {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(.secondary)
-                    .padding(12)
-                    .background(Color.white.opacity(0.2))
-                    .clipShape(Circle())
+            // 右上のボタン（同期ボタンと設定ボタン）
+            HStack(spacing: 8) {
+                // 同期ボタン（ログイン時のみ表示）
+                if authManager.isAuthenticated {
+                    Button(action: {
+                        Task {
+                            await syncManager.syncFromCloud()
+                        }
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .font(.system(size: 16))
+                            .foregroundColor(.secondary)
+                            .padding(12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .disabled(syncManager.isSyncing)
+                }
+
+                // 設定ボタン
+                Button(action: {
+                    WindowManager.shared.showSettingsWindow()
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
+                        .padding(12)
+                        .background(Color.white.opacity(0.2))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .focusable(false)
             }
-            .buttonStyle(.plain)
-            .focusable(false)
             .padding(16)
         }
     }
