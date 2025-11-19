@@ -94,8 +94,10 @@ class SyncManager: ObservableObject {
         // リアルタイムリスナーを開始
         setupRealtimeListener()
 
-        // 定期同期を開始
-        startPeriodicSync()
+        // 定期同期を開始（メインスレッドで実行）
+        Task { @MainActor in
+            startPeriodicSync()
+        }
     }
 
     // 同期を停止
@@ -105,24 +107,32 @@ class SyncManager: ObservableObject {
             realtimeChannel = nil
         }
 
-        // 定期同期を停止
-        stopPeriodicSync()
+        // 定期同期を停止（メインスレッドで実行）
+        Task { @MainActor in
+            stopPeriodicSync()
+        }
     }
 
     // 定期同期を開始（10秒間隔）
+    @MainActor
     private func startPeriodicSync() {
         // 既存のタイマーがあれば停止
         stopPeriodicSync()
 
         // 10秒間隔で同期を実行
         periodicSyncTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task {
                 await self?.syncFromCloud(allowDecrease: false)
             }
+        }
+        // RunLoopに明示的にタイマーを追加
+        if let timer = periodicSyncTimer {
+            RunLoop.main.add(timer, forMode: .common)
         }
     }
 
     // 定期同期を停止
+    @MainActor
     private func stopPeriodicSync() {
         periodicSyncTimer?.invalidate()
         periodicSyncTimer = nil
