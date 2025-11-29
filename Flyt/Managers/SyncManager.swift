@@ -137,7 +137,11 @@ class SyncManager: ObservableObject {
                     lastSyncStatus = .success
                 }
             } else {
-                lastSyncMessage = "クラウドにデータがありません"
+                // クラウドにデータがない場合、Server as Source of Truthの原則に従い
+                // ローカルのセッション数を0にリセット
+                onSessionCountUpdated?(0)
+                UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.lastUpdated)
+                lastSyncMessage = "クラウドにデータがありません（ローカルを0にリセットしました）"
                 lastSyncStatus = .info
             }
 
